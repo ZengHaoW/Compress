@@ -31,7 +31,7 @@ public class Grey {
         /*File file = new File("C:\\Users\\ZengHW\\Desktop\\h\\lena_grey.bmp");
         BufferedImage img = ImageIO.read(file);*/
         String imgfile = "C:\\Users\\ZengHW\\Desktop\\h\\lena_gray.jpg";
-        int[][] a = read_grey(imgfile);
+        int[][] a = read_grey(imgfile);// [W, H]
         System.out.println(1);
     }
 }
