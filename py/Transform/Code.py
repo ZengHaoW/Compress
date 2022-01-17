@@ -4,7 +4,7 @@ from Read_image import Grey
 from Transform import Compute, Split
 
 
-def DC(block):
+def DC(block):        #差值计算
     temp1 = Compute.stage(block)
     temp2 = np.diff(temp1)
     temp3 = np.zeros(shape=8, dtype=block.dtype)
@@ -16,7 +16,7 @@ def DC(block):
     return temp4
 
 
-def DC_Code(block):
+def DC_Code(block):         #DC编码
     temp = DC(block)
     result = np.zeros(shape=block.shape, dtype='U12')
 
@@ -24,56 +24,56 @@ def DC_Code(block):
         for j in range(temp.shape[1]):
             k = abs(temp[i][j])
             if k == 0:
-                result[i][j] = "000" + "0"
+                result[i][j] = "000" + "0"                          # 3 + 1 = 4
             elif k < 2:
                 if temp[i][j] < 0:
                     result[i][j] = '{:01b}'.format(k ^ 0b1)
                 else:
                     result[i][j] = '{:01b}'.format(k)
-                result[i][j] = "001" + result[i][j]
+                result[i][j] = "001" + result[i][j]                 # 3 + 1 = 4
             elif k < 4:
                 if temp[i][j] < 0:
                     result[i][j] = '{:02b}'.format(k ^ 0b11)
                 else:
                     result[i][j] = '{:02b}'.format(k)
-                result[i][j] = "010" + result[i][j]
+                result[i][j] = "010" + result[i][j]                 # 3 + 2 = 5
             elif k < 8:
                 if temp[i][j] < 0:
                     result[i][j] = '{:03b}'.format(k ^ 0b111)
                 else:
                     result[i][j] = '{:03b}'.format(k)
-                result[i][j] = "011" + result[i][j]
+                result[i][j] = "011" + result[i][j]                 # 3 + 3 = 6
 
             elif k < 16:
                 if temp[i][j] < 0:
                     result[i][j] = '{:04b}'.format(k ^ 0b1111)
                 else:
                     result[i][j] = '{:04b}'.format(k)
-                result[i][j] = "100" + result[i][j]
+                result[i][j] = "100" + result[i][j]                 # 3 + 4 = 7
             elif k < 32:
                 if temp[i][j] < 0:
                     result[i][j] = '{:05b}'.format(k ^ 0b11111)
                 else:
                     result[i][j] = '{:05b}'.format(k)
-                result[i][j] = "101" + result[i][j]
+                result[i][j] = "101" + result[i][j]                # 3 + 5 = 8
             elif k < 64:
                 if temp[i][j] < 0:
                     result[i][j] = '{:06b}'.format(k ^ 0b111111)
                 else:
                     result[i][j] = '{:06b}'.format(k)
-                result[i][j] = "110" + result[i][j]
+                result[i][j] = "110" + result[i][j]               # 3 + 6 = 9
             elif k < 128:
                 if temp[i][j] < 0:
                     result[i][j] = '{:07b}'.format(k ^ 0b1111111)
                 else:
                     result[i][j] = '{:07b}'.format(k)
-                result[i][j] = "1110" + result[i][j]
+                result[i][j] = "1110" + result[i][j]             # 4 + 7 = 11
             elif k < 256:
                 if temp[i][j] < 0:
                     result[i][j] = '{:08b}'.format(k ^ 0b11111111)
                 else:
                     result[i][j] = '{:08b}'.format(k)
-                result[i][j] = "1111" + result[i][j]
+                result[i][j] = "1111" + result[i][j]            # 4 + 8 = 12
     return result
 
 
@@ -83,6 +83,59 @@ def calculated_length(block):
         for j in i:
             count = count + len(j)
     return count
+def inv_code(block):   #DC反变换
+    H = block.shape[0]
+    W = block.shape[1]
+    result = np.zeros(shape=block.shape, dtype=int)
+    for i in range(H):
+        for j in range(W):
+            num = block[i][j]
+            length = len(num)
+            if length == 4:
+                if num[:3] == '000':
+                    result[i][j] = 0
+                else:
+                    if num[3:4] == '0':
+                        result[i][j] = -(int(num[3:], 2) ^ 0b1)
+                    else:
+                        result[i][j] = int(num[3:], 2)
+            elif length == 5:
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b11)
+                else:
+                    result[i][j] = int(num[3:], 2)
+            elif length == 6:
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b111)
+                else:
+                    result[i][j] = int(num[3:], 2)
+            elif length == 7:
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b1111)
+                else:
+                    result[i][j] = int(num[3:], 2)
+            elif length == 8:
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b11111)
+                else:
+                    result[i][j] = int(num[3:], 2)
+            elif length == 9:
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b111111)
+                else:
+                    result[i][j] = int(num[3:], 2)
+            elif length == 11:
+                if num[4:5] == '0':
+                    result[i][j] = -(int(num[4:], 2) ^ 0b11111111)
+                else:
+                    result[i][j] = int(num[4:], 2)
+            elif length == 12:
+                if num[4:5] == '0':
+                    result[i][j] = -(int(num[4:], 2) ^ 0b11111111)
+                else:
+                    result[i][j] = int(num[4:], 2)
+    return result
+
 
 def every_block(np_matrix):         # 64*64*8*8
     result = result = np.zeros(shape=np_matrix.shape, dtype='U12')
@@ -99,26 +152,37 @@ if __name__ == '__main__':
                      [136, 140, 137, 136, 135, 132, 138, 138],
                      [137, 139, 139, 136, 131, 129, 139, 138],
                      [138, 135, 137, 134, 138, 136, 139, 137]])
-    # print(test)
-    # print()
-    # b = DC(test)
-    # print(b)
-    # print()
+    print("测试用例")
+    print(test)
+    print("变换：")
+    print(Compute.stage(test))
+    print("DC:")
+    b = DC(test)
+    print(b)
+    print("DC编码")
+    d = DC_Code(test)
+    print(d)
+    print("编码后位长：")
+    print(calculated_length(DC_Code(test)))
+    print("DC解码：")
+    print(inv_code(d))
     # for num in b:
     #     for i in num:
     #         i = bin(i)
     # print(b)
-    path = "C://Users//ZengHW//Desktop//h//lena_gray.bmp"
-    a = Grey.read(path)
-    b = Split.to_8(a, 1)
-    c = Compute.every_block(b)
-    d = every_block(c)
-    print(d)
-    count = 0
-    for i in d:
-        for j in i:
-            count = count + calculated_length(j)
-    print(count)
+
+    # path = "C://Users//ZengHW//Desktop//h//lena_gray.bmp"
+    # a = Grey.read(path)
+    # b = Split.to_8(a, 1)
+    # c = Compute.every_block(b)
+    # d = every_block(c)
+    # print(d)
+    # count = 0
+    # for i in d:
+    #     for j in i:
+    #         count = count + calculated_length(j)
+    # print(count)
+
     # a = Compute.stage(test)
     # b = np.diff(a)
     # c = np.zeros(shape=8, dtype=a.dtype)
