@@ -9,7 +9,7 @@ public class Main {
         int[][] a = Grey.read_grey(img_name);
         int[][][] b = Split.to_8(a);
         int[][][] z = Compute.every_blocks(img_name);
-        String[] c = Code.Encoding_2(z);
+        String[] c = Code.Encoding_1(z);
         int length = Code.compute_length(c);
 
         System.out.println(z.length * z[0].length * z[0][0].length * 8);
