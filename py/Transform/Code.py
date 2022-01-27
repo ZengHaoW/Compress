@@ -60,37 +60,37 @@ def DC_Code(block):  # DC编码
 
             elif k < 16:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:04b}'.format(k ^ 0b1111)
+                    result[i][j] = '{:04b}'.format(k ^ 0b1_111)
                 else:
                     result[i][j] = '{:04b}'.format(k)
                 result[i][j] = "101" + result[i][j]  # 3 + 4 = 7
             elif k < 32:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:05b}'.format(k ^ 0b11111)
+                    result[i][j] = '{:05b}'.format(k ^ 0b11_111)
                 else:
                     result[i][j] = '{:05b}'.format(k)
                 result[i][j] = "110" + result[i][j]  # 3 + 5 = 8
             elif k < 64:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:06b}'.format(k ^ 0b111111)
+                    result[i][j] = '{:06b}'.format(k ^ 0b111_111)
                 else:
                     result[i][j] = '{:06b}'.format(k)
                 result[i][j] = "1110" + result[i][j]  # 4 + 6 = 10
             elif k < 128:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:07b}'.format(k ^ 0b1111111)
+                    result[i][j] = '{:07b}'.format(k ^ 0b1_111_111)
                 else:
                     result[i][j] = '{:07b}'.format(k)
                 result[i][j] = "11110" + result[i][j]  # 5 + 7 = 12
             elif k < 256:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:08b}'.format(k ^ 0b11111111)
+                    result[i][j] = '{:08b}'.format(k ^ 0b11_111_111)
                 else:
                     result[i][j] = '{:08b}'.format(k)
                 result[i][j] = "111110" + result[i][j]  # 6 + 8 = 14
             elif k < 512:
                 if temp[i][j] < 0:
-                    result[i][j] = '{:09b}'.format(k ^ 0b111111111)
+                    result[i][j] = '{:09b}'.format(k ^ 0b111_111_111)
                 else:
                     result[i][j] = '{:09b}'.format(k)
                 result[i][j] = "1111110" + result[i][j]  # 7 + 9 = 16
@@ -112,60 +112,62 @@ def inv_code(block):  # DC反变换
     result = np.zeros(shape=block.shape, dtype=int)
     for i in range(H):
         for j in range(W):
-            num = block[i][j]
+            num = block[i][j]  # 字符串
             length = len(num)
-            if length == 3:
+
+            if num[:2] == '00':
                 result[i][j] = 0
-            elif length == 4:
+            elif num[:3] == '010':
                 if num[3:4] == '0':
-                    result[i][j] = -(int(num[3:], 2) ^ 0b1)
+                    result[i][j] = -1
                 else:
-                    result[i][j] = int(num[3:], 2)
-            elif length == 5:
+                    result[i][j] = 1
+            elif num[:3] == '011':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b11)
                 else:
-                    result[i][j] = int(num[3:], 2)
-            elif length == 6:
+                    result[i][j] = result[i][j] = int(num[3:], 2)
+            elif num[:3] == '100':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b111)
                 else:
-                    result[i][j] = int(num[3:], 2)
-            elif length == 7:
+                    result[i][j] = result[i][j] = int(num[3:], 2)
+            elif num[:3] == '101':
                 if num[3:4] == '0':
-                    result[i][j] = -(int(num[3:], 2) ^ 0b1111)
+                    result[i][j] = -(int(num[3:], 2) ^ 0b1_111)
                 else:
-                    result[i][j] = int(num[3:], 2)
-            elif length == 8:
+                    result[i][j] = result[i][j] = int(num[3:], 2)
+            elif num[:3] == '110':
                 if num[3:4] == '0':
-                    result[i][j] = -(int(num[3:], 2) ^ 0b11111)
+                    result[i][j] = -(int(num[3:], 2) ^ 0b11_111)
                 else:
-                    result[i][j] = int(num[3:], 2)
-            elif length == 10:
+                    result[i][j] = result[i][j] = int(num[3:], 2)
+            elif num[:4] == '1110':
                 if num[4:5] == '0':
-                    result[i][j] = -(int(num[4:], 2) ^ 0b111111)
+                    result[i][j] = -(int(num[4:], 2) ^ 0b111_111)
                 else:
-                    result[i][j] = int(num[4:], 2)
-            elif length == 12:
+                    result[i][j] = result[i][j] = int(num[4:], 2)
+            elif num[:5] == '11110':
                 if num[5:6] == '0':
-                    result[i][j] = -(int(num[5:], 2) ^ 0b1111111)
+                    result[i][j] = -(int(num[5:], 2) ^ 0b1_111_111)
                 else:
-                    result[i][j] = int(num[5:], 2)
-            elif length == 14:
+                    result[i][j] = result[i][j] = int(num[5:], 2)
+            elif num[:6] == '111110':
                 if num[6:7] == '0':
-                    result[i][j] = -(int(num[6:], 2) ^ 0b11111111)
+                    result[i][j] = -(int(num[6:], 2) ^ 0b11_111_111)
                 else:
-                    result[i][j] = int(num[6:], 2)
-            elif length == 16:
+                    result[i][j] = result[i][j] = int(num[6:], 2)
+            elif num[:7] == '1111110':
                 if num[7:8] == '0':
-                    result[i][j] = -(int(num[7:], 2) ^ 0b111111111)
+                    result[i][j] = -(int(num[7:], 2) ^ 0b111_111_111)
                 else:
-                    result[i][j] = int(num[7:], 2)
+                    result[i][j] = result[i][j] = int(num[7:], 2)
+
     return result
 
 
 def every_block(np_matrix):  # 64*64*8*8
-    result = result = np.zeros(shape=np_matrix.shape, dtype='U12')
+    result = result = np.zeros(shape=np_matrix.shape, dtype='U12')  # 'U12'
     for i in range(np_matrix.shape[0]):
         for j in range(np_matrix.shape[1]):
             result[i][j] = DC_Code(np_matrix[i][j])
@@ -216,7 +218,7 @@ if __name__ == '__main__':
     f = inv_DC(e)
     print("jiema")
     print(f)
-    print((f==test).all())
+    print((f == test).all())
     # path = "C://Users//ZengHW//Desktop//h//lena_gray.bmp"
     # a = Grey.read(path)
     # b = Split.to_8(a, 1)
