@@ -31,14 +31,14 @@ def inv_DC(block):
 
 
 def DC_Code(block):  # DC编码
-    temp = DC(block)
+    temp = block.copy()
     result = np.zeros(shape=block.shape, dtype='U12')
 
     for i in range(temp.shape[0]):
         for j in range(temp.shape[1]):
             k = abs(temp[i][j])
             if k == 0:
-                result[i][j] = "00" + "0"  # 2 + 1 = 3
+                result[i][j] = "00" + "0"  # 3 + 1 = 5
             elif k < 2:
                 if temp[i][j] < 0:
                     result[i][j] = '{:01b}'.format(k ^ 0b1)
@@ -75,34 +75,46 @@ def DC_Code(block):  # DC编码
                     result[i][j] = '{:06b}'.format(k ^ 0b111_111)
                 else:
                     result[i][j] = '{:06b}'.format(k)
-                result[i][j] = "1110" + result[i][j]  # 4 + 6 = 10
+                result[i][j] = "1110" + result[i][j]  # 3 + 6 = 9
             elif k < 128:
                 if temp[i][j] < 0:
                     result[i][j] = '{:07b}'.format(k ^ 0b1_111_111)
                 else:
                     result[i][j] = '{:07b}'.format(k)
-                result[i][j] = "11110" + result[i][j]  # 5 + 7 = 12
+                result[i][j] = "11110" + result[i][j]  # 4 + 7 = 11
             elif k < 256:
                 if temp[i][j] < 0:
                     result[i][j] = '{:08b}'.format(k ^ 0b11_111_111)
                 else:
                     result[i][j] = '{:08b}'.format(k)
-                result[i][j] = "111110" + result[i][j]  # 6 + 8 = 14
-            elif k < 512:
-                if temp[i][j] < 0:
-                    result[i][j] = '{:09b}'.format(k ^ 0b111_111_111)
-                else:
-                    result[i][j] = '{:09b}'.format(k)
-                result[i][j] = "1111110" + result[i][j]  # 7 + 9 = 16
+                result[i][j] = "111110" + result[i][j]  # 4 + 8 = 12
 
     return result
 
-
+def calulated_all(np_matrix, mode):
+    count = 0
+    if mode == 1:
+        for i in np_matrix:
+            for j in i:
+                count = count + calculated_length(j)
+    else:
+        for k in range(3):
+            for i in np_matrix[k]:
+                for j in i:
+                    count = count + calculated_length(j)
+    return count
 def calculated_length(block):
     count = 0
     for i in block:
         for j in i:
             count = count + len(j)
+    return count
+def qqq(block):
+    count = 0
+    for i in block:
+        for j in i:
+            if j > 255 or j < -255:
+                count = count + 1
     return count
 
 
@@ -115,62 +127,64 @@ def inv_code(block):  # DC反变换
             num = block[i][j]  # 字符串
             length = len(num)
 
-            if num[:2] == '00':
+            if num[:3] == '000':
                 result[i][j] = 0
-            elif num[:3] == '010':
+            elif num[:3] == '001':
                 if num[3:4] == '0':
                     result[i][j] = -1
                 else:
                     result[i][j] = 1
-            elif num[:3] == '011':
+            elif num[:3] == '010':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b11)
                 else:
                     result[i][j] = result[i][j] = int(num[3:], 2)
-            elif num[:3] == '100':
+            elif num[:3] == '011':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b111)
                 else:
                     result[i][j] = result[i][j] = int(num[3:], 2)
-            elif num[:3] == '101':
+            elif num[:3] == '100':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b1_111)
                 else:
                     result[i][j] = result[i][j] = int(num[3:], 2)
-            elif num[:3] == '110':
+            elif num[:3] == '101':
                 if num[3:4] == '0':
                     result[i][j] = -(int(num[3:], 2) ^ 0b11_111)
                 else:
                     result[i][j] = result[i][j] = int(num[3:], 2)
+            elif num[:3] == '110':
+                if num[3:4] == '0':
+                    result[i][j] = -(int(num[3:], 2) ^ 0b111_111)
+                else:
+                    result[i][j] = result[i][j] = int(num[3:], 2)
             elif num[:4] == '1110':
                 if num[4:5] == '0':
-                    result[i][j] = -(int(num[4:], 2) ^ 0b111_111)
+                    result[i][j] = -(int(num[4:], 2) ^ 0b1_111_111)
                 else:
                     result[i][j] = result[i][j] = int(num[4:], 2)
-            elif num[:5] == '11110':
-                if num[5:6] == '0':
-                    result[i][j] = -(int(num[5:], 2) ^ 0b1_111_111)
+            elif num[:4] == '1111':
+                if num[4:5] == '0':
+                    result[i][j] = -(int(num[4:], 2) ^ 0b11_111_111)
                 else:
-                    result[i][j] = result[i][j] = int(num[5:], 2)
-            elif num[:6] == '111110':
-                if num[6:7] == '0':
-                    result[i][j] = -(int(num[6:], 2) ^ 0b11_111_111)
-                else:
-                    result[i][j] = result[i][j] = int(num[6:], 2)
-            elif num[:7] == '1111110':
-                if num[7:8] == '0':
-                    result[i][j] = -(int(num[7:], 2) ^ 0b111_111_111)
-                else:
-                    result[i][j] = result[i][j] = int(num[7:], 2)
+                    result[i][j] = result[i][j] = int(num[4:], 2)
+
 
     return result
 
 
-def every_block(np_matrix):  # 64*64*8*8
-    result = result = np.zeros(shape=np_matrix.shape, dtype='U12')  # 'U12'
-    for i in range(np_matrix.shape[0]):
-        for j in range(np_matrix.shape[1]):
-            result[i][j] = DC_Code(np_matrix[i][j])
+def every_block(np_matrix, mode):  # 64*64*8*8
+    result = np.zeros(shape=np_matrix.shape, dtype='U12')  # 'U12'
+    if mode == 1:
+        for i in range(np_matrix.shape[0]):
+            for j in range(np_matrix.shape[1]):
+                result[i][j] = DC_Code(np_matrix[i][j])
+    else:
+        for k in range(3):
+            for i in range(np_matrix.shape[1]):
+                for j in range(np_matrix.shape[2]):
+                    result[k][i][j] = DC_Code(np_matrix[k][i][j])
     return result
 
 
@@ -178,7 +192,7 @@ def inv_every_block(np_matrix):
     result = np.zeros(shape=np_matrix.shape, dtype=int)
     for i in range(np_matrix.shape[0]):
         for j in range(np_matrix.shape[1]):
-            result[i][j] = inv_DC(inv_code(np_matrix[i][j]))
+            result[i][j] = inv_code(np_matrix[i][j])
     return result
 
 

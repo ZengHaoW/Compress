@@ -13,7 +13,7 @@ def save(image_path, matrix):
 
 
 if __name__ == '__main__':
-    path = "C://Users//ZengHW//Desktop//h//lena_gray.bmp"
+    path = "C://Users//ZengHW//Desktop//test image//4.1.01.tiff"
     a = read(path)
     a = np.array(a, dtype=np.int)
     print(a)

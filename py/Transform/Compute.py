@@ -275,11 +275,17 @@ def stage(block):
 def inv_stage(block):
     return stage1_inv(stage2_inv(stage3_inv(block)))
 
-def every_block(np_matrix):  # 64*64*8*8
+def every_block(np_matrix, mode):  # 64*64*8*8   mode=1 :GREY  mode=0 :RGB
     result = np_matrix.copy()
-    for i in range(np_matrix.shape[0]):
-        for j in range(np_matrix.shape[1]):
-            result[i][j] = stage(np_matrix[i][j])
+    if mode == 1:
+        for i in range(np_matrix.shape[0]):
+            for j in range(np_matrix.shape[1]):
+                result[i][j] = stage(np_matrix[i][j])
+    else:
+        for k in range(3):
+            for i in range(np_matrix.shape[1]):
+                for j in range(np_matrix.shape[2]):
+                    result[k][i][j] = stage(np_matrix[k][i][j])
     return result
 def inv_every_block(np_matrix):  # 64*64*8*8
     result = np_matrix.copy()

@@ -1,12 +1,11 @@
 import cv2
-
-
+import numpy as np
 
 
 def read(image_path):
     img = cv2.imread(image_path)  # reads an image in the BGR format        [H,W,3]
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # BGR -> RGB
-    return img
+    return np.array(img, dtype=np.int)
 
 def save(image_path, matrix):
     matrix = cv2.cvtColor(matrix, cv2.COLOR_RGB2BGR)
