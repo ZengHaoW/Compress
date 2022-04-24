@@ -1,4 +1,4 @@
 clear;
 clc;
-% 读取图片
-testImage = imread("C:\Users\ZengHW\Desktop\Compress\f\4.1.01.tiff");
+% 读取图片  (h, w, )
+image = imread("C:\Users\ZengHW\Desktop\NRC-BMP\lena_gray.jpg");
