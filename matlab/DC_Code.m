@@ -1,0 +1,44 @@
+function [afterCode] = DC_Code(oneDimensionData)
+%DC_CODE 此处显示有关此函数的摘要
+%   此处显示详细说明
+    [~, dataLength] = size(oneDimensionData);
+    afterCode = ones(1, dataLength * 8);
+    total_length = 1;
+    for i=1:dataLength
+        if oneDimensionData(i) < 0  %小于零的先转补码
+            temp_abs = abs(oneDimensionData(i));
+            if temp_abs < 2
+                l = 1;
+            elseif temp_abs < 4
+                l = 2;
+            elseif temp_abs < 8
+                l = 3;
+            elseif temp_abs < 16
+                l = 4;
+            elseif temp_abs < 32
+                l = 5;
+            elseif temp_abs < 64
+                l = 6;
+            elseif temp_abs < 128
+                l = 7;
+            else
+                l = 8;
+            end
+            temp = bitcmp(temp_abs, 'uint8');
+            temp = de2bi(temp, 8,'left-msb');
+            temp = temp(9-l:8);
+            tempAfterCode = [DC_Table(temp_abs), temp];
+            [~, temp_length] =  size(tempAfterCode);
+            afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
+            total_length = total_length + temp_length;
+        else
+            temp = oneDimensionData(i);
+            tempAfterCode = [DC_Table(temp), de2bi(temp, 'left-msb')];
+            [~, temp_length] =  size(tempAfterCode);
+            afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
+            total_length = total_length + temp_length;
+        end
+    end
+    afterCode = afterCode(1: total_length - 1);
+end
+

@@ -1,6 +1,6 @@
-function [imageMatrix_8,thumbnail] = transformTotalImage(imagePath)
+function [normalMatrix, imageMatrix_8,thumbnail] = transformTotalImage(imagePath)
 %TRANSFORMTOTALIMAGE 对整张图像进行变换
-%   得到计算后结果imageMatrix_8, 访问缩略图thumbnail
+%   得到计算后结果imageMatrix_8, 访问缩略图thumbnail,normalMatrix为imageMatrix_8合并
 %   imageMatrix_8（抛去缩略图，需要{i, j}访问, 每个imageMatrix_8{i， j}为8*8的矩阵。
     imageMatrix = readImage(imagePath);
     imageMatrix_8 = splitImageTo8(imageMatrix);
@@ -12,4 +12,5 @@ function [imageMatrix_8,thumbnail] = transformTotalImage(imagePath)
             [imageMatrix_8{i, j}, thumbnail(i, j)] = transform(imageMatrix_8{i, j});
         end
     end
+    normalMatrix = cell2mat(imageMatrix_8);
 end
