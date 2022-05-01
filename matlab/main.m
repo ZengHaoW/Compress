@@ -1,11 +1,15 @@
 clear;
 clc;
-imagePath = './testImage/7.2.01.tiff';
-[normalMatrix, a,c] = transformTotalImage(imagePath);
+imagePath = './testImage/lena_gray.bmp';
+[normalMatrix, suoluetu] = transformTotalImage(imagePath);
 oneDimension = reshape(normalMatrix,1,[]);
+[H, W] = size(normalMatrix);
 x = DC_Code(oneDimension);
-size(x)
-% b = invTransformTotalImage(a,c);
-% imshow(b,[])
 
-% 5956813  5863667
+c = DC_DeCode(x);
+d = reshape(c, H, W);
+% length(x)
+b = invTransformTotalImage(d,suoluetu);
+imshow(b,[])
+
+% 5956123  5863667  5956813

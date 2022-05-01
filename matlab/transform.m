@@ -3,7 +3,7 @@ function [result, pixelDontChange] = transform(Block)
 %   此处显示详细说明
     result = stage3(stage2(stage1(Block)));
     pixelDontChange = result(1, 1);
-    result(1, 1) = 0;
+%     result(1, 1) = 0;
 end
 
 function [result] = stage1(Block_8)
