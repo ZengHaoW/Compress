@@ -2,8 +2,8 @@ function [pixel] = DNADecoding(DNA_Code, nums)
 %DNADECODING 根据nums将DNA_Code解码
 %   DNA_Code(1, 5)   pixel(1, 1)
     r = ['A' 'T' 'C' 'G'];
-    temp = ones(1, 5);  %存放解码后的位数，从高到底 
-    for i = 1: 5
+    temp = ones(1, 4);  %存放解码后的位数，从高到底 
+    for i = 1: 4
         if DNA_Code(i) == r(1)          % A
             if nums == 1 || nums == 2
                 temp(i) = 0;
@@ -46,6 +46,6 @@ function [pixel] = DNADecoding(DNA_Code, nums)
             end
         end
     end
-    pixel = bitshift(temp(1), 8) + bitshift(temp(2), 6) + bitshift(temp(3), 4) + bitshift(temp(4), 2) + temp(5);
+    pixel = bitshift(temp(1), 6) + bitshift(temp(2), 4) + bitshift(temp(3), 2) + temp(4);
 end
 

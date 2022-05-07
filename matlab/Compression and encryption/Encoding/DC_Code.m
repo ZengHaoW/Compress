@@ -1,5 +1,5 @@
-function [afterCode] = DC_Code(oneDimensionData)
-%DC_CODE 此处显示有关此函数的摘要
+function [result] = DC_Code(oneDimensionData)
+%DC_CODE 返回的是cell
 %   此处显示详细说明
     [~, dataLength] = size(oneDimensionData);
     %%
@@ -30,6 +30,7 @@ function [afterCode] = DC_Code(oneDimensionData)
     %%
     afterCode = ones(1, dataLength * 8);
     total_length = 1;
+    result = cell(1, dataLength);
     for i=1:dataLength
         if oneDimensionData(i) < 0  %小于零的先转补码
             temp_abs = abs(oneDimensionData(i));
@@ -54,9 +55,10 @@ function [afterCode] = DC_Code(oneDimensionData)
             temp = de2bi(temp, 8,'left-msb');
             temp = temp(9-l:8);
             tempAfterCode = [DC_Table(temp_abs), temp];
-            [~, temp_length] =  size(tempAfterCode);
-            afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
-            total_length = total_length + temp_length;
+            result{i} = tempAfterCode;
+%             [~, temp_length] =  size(tempAfterCode);
+%             afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
+%             total_length = total_length + temp_length;
         else
             temp = oneDimensionData(i);
             if temp == 0
@@ -64,12 +66,13 @@ function [afterCode] = DC_Code(oneDimensionData)
             else
                 tempAfterCode = [DC_Table(temp), de2bi(temp, 'left-msb')];
             end
-            [~, temp_length] =  size(tempAfterCode);
-            afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
-            total_length = total_length + temp_length;
+            result{i} = tempAfterCode;
+%             [~, temp_length] =  size(tempAfterCode);
+%             afterCode(total_length: total_length + temp_length - 1) = tempAfterCode;
+%             total_length = total_length + temp_length;
         end
     end
-    afterCode = afterCode(1: total_length - 1);
-
+%     afterCode = afterCode(1: total_length - 1);
+%     afterCode = cell2mat(result);
 end
 

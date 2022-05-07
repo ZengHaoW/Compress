@@ -15,5 +15,17 @@ function [X, Y, Z, H] = generateSequences(x1, x2, x3, x4, l)
     Z = Z(5001: 5000 + l);
     H = y(4,:);
     H = H(5001: 5000 + l);
+%     v0 = [x1 x2 x3 x4];
+%     fun = @(t,v) chen(t,v);
+%     [t, v] = ode45(fun, [0:0.01:5000], v0);
+%     
+%     x = v(:,1);
+%     X = round(x(5001: l + 5000 ), 4);
+%     y = v(:,2);
+%     Y = round(y(5001: 5000 + l), 4);
+%     z = v(:,3);
+%     Z = round(z(5001: 5000 + l), 4);
+%     w = v(:,4);
+%     H = round(w(5001: 5000 + l), 4);
 end
 

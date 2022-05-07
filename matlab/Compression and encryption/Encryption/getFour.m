@@ -8,15 +8,22 @@ function [LT, RT, LB, RB] = getFour(thumbnail)
     thumbnail_8 = splitImageTo8(thumbnail);
     [H, ~] = size(thumbnail);
     blockNums = H / 8;
+
     for i = 1: blockNums
         for j = 1: blockNums
             [thumbnail_8{i, j}, p] = transform(thumbnail_8{i, j});
             thumbnail_8{i, j}(1, 1) = p;
+            % 将矩阵位置交换并进行逆变换
+            temp = thumbnail_8{i, j};
+%             temp = positionChange(temp);
+            temp = temp + 255;
+            thumbnail_8{i, j} = transformInv2(temp, temp(1, 1));
         end
     end
+
     afterTransform = cell2mat(thumbnail_8);
-    % 将变换后的值每个加上255
-    afterTransform = afterTransform + 255;
+%     % 将变换后的值每个加上255
+%     afterTransform = afterTransform + 255;
     % 将图片分成4块，分别位LT, RT, LB, RB
     smallBlockLength = H / 2;
     LT = afterTransform(1: smallBlockLength, 1: smallBlockLength);

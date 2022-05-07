@@ -5,15 +5,22 @@ addpath(genpath('./Chaotic System'));
 addpath(genpath('./Transform'));
 addpath(genpath('./Encryption'));
 addpath(genpath('./Encoding'));
+addpath(genpath('./keys'))
 tic
-%% 读取图片，做变换与编码，取出缩略图
 
-imagePath = './testImage/lena_gray.bmp';
+
+imagePath = './testImage/white.png';
+%% 获取密钥，计算图像的SHA-256，key为256位，表示为64位的16进制字符串 
+t = [2, 5, 7, 3];
+[x0, y0, z0, w0] = getkeys(imagePath, t);
+
+
 [normalMatrix, suoluetu] = transformTotalImage(imagePath);
 oneDimension = reshape(normalMatrix,1,[]);
 [H, W] = size(normalMatrix);                                %图片的高宽
+tic
 afterDC = DC_Code(oneDimension);                            %直流编码
-
+toc
 %% 生成4维混沌序列
 SUM = H * W;                                                %图像总像素个数
 I = readImage(imagePath);
@@ -57,46 +64,46 @@ for i = 1: nums * 3
     y_E(i) = mod(round(y_E(i) * 10^4), 8) + 1;
     z_D(i) = mod(round(z_D(i) * 10^4), 8) + 1;
     y_z_Xor(i) = mod(round(y_z_Xor(i) * 10^4), 4) + 1;
-    Xor_M(i) = mod(round(Xor_M(i) * 10^6), 510) + 1;
+    Xor_M(i) = mod(round(Xor_M(i) * 10^5), 256);
 end
 %DNA编码
-seqDNA = ones(1, nums * 3 * 5);                             %三个子带内的值均为10位，DNA长度需乘以5
-Xor_M_DNA = ones(1, nums * 3 * 5);
+seqDNA = ones(1, nums * 3 * 4);                             %三个子带内的值均位8位，DNA长度需要乘以4
+Xor_M_DNA = ones(1, nums * 3 * 4);
 for i = 1: nums * 3
     if i == 1
-        seqDNA(1: 5) = DNAEncoding(seq(i), y_E(i));
-        Xor_M_DNA(1: 5) = DNAEncoding(Xor_M(i), y_E(i));
+        seqDNA(1: 4) = DNAEncoding(seq(i), y_E(i));
+        Xor_M_DNA(1: 4) = DNAEncoding(Xor_M(i), y_E(i));
     else
-        seqDNA(5 * (i - 1) + 1: 5 * i) = DNAEncoding(seq(i), y_E(i));
-        Xor_M_DNA(5 * (i - 1) + 1: 5 * i) = DNAEncoding(Xor_M(i), y_E(i));
+        seqDNA(4 * (i - 1) + 1: 4 * i) = DNAEncoding(seq(i), y_E(i));
+        Xor_M_DNA(4 * (i - 1) + 1: 4 * i) = DNAEncoding(Xor_M(i), y_E(i));
     end
 end
 %DNA异或
-seqDNA_Xor = ones(1, nums * 3 * 5);
-for i = 1: nums * 3 * 5
+seqDNA_Xor = ones(1, nums * 3 * 4);
+for i = 1: nums * 3 * 4
     if i <= n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i));
     elseif i <= 2 * n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - n));
     elseif i <= 3 * n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 2*n));
-    elseif i <= 4 * n
-        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 3*n));
     else
-        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 4 * n));
+        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 3*n));
+%     else
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 4 * n));
     end
 end
 %DNA解密
 seqAfterDNA = ones(1, nums * 3);
 for i = 1: nums * 3
     if i == 1
-        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(1: 5), z_D(i));
+        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(1: 4), z_D(i));
     else
-        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(5 * (i - 1) + 1: 5 * i), z_D(i));
+        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(4 * (i - 1) + 1: 4 * i), z_D(i));
     end
 end
 
-%% 对LT进行高低位加密   H * W为原图像的尺寸, LT尺寸为 H / 16 * W / 16  LT各个元素为10位数, 全程列向量
+%% 对LT进行高低位加密   H * W为原图像的尺寸, LT尺寸为 H / 16 * W / 16  LT各个元素为8位数, 全程计算为列向量
 LT_H = s_H;
 LT_W = s_W;
 LT_Len = LT_H * LT_W;
@@ -105,31 +112,31 @@ x_P = x(LT_H + 1: LT_H * 2);
 y_P = y(LT_H + 1: LT_H * 2);
 A = x_P' * y_P;
 A = reshape(A, 1, []);
-A = mod(floor(A*power(10,15)),16);
+A = mod(floor(A*power(10,15)), 16);
 A = sort_S(A);
 %z序列取LT_H个，h序列取LT_W个，相乘得到扩散序列B
 z_P = z(LT_H + 1: LT_H * 2);
 h_P = h(LT_H + 1: LT_H * 2);
 B = z_P' * h_P;
 B = reshape(B, 1, []);
-B = mod(floor(B*power(10,16)),1024);
+B = mod(floor(B*power(10,16)), 1024);
 D_r = B(1: LT_Len / 2);%用来做行扩散，每行共N个元素
 D_c = B(1 + LT_Len / 2: end);%用来进行列扩散，每列共M个元素
 
-% 将图像分为高5位和低5位，分别用十进制表示
-LT_Bin = de2bi(LT, 10,'left-msb');                            %按列转换，每一行为10位二进制
-LT_Bin_H = LT_Bin(:, 6: 10);
-LT_Bin_L = LT_Bin(:, 1: 5);
+% 将图像分为高4位和低4位，分别用十进制表示
+LT_Bin = de2bi(LT, 8,'left-msb');                            %按列转换，每一行为8位二进制
+LT_Bin_H = LT_Bin(:, 5: 8);
+LT_Bin_L = LT_Bin(:, 1: 4);
 LT_h = bi2de(LT_Bin_H, 'left-msb');
-% LT_h = reshape(LT_h, LT_H, LT_W);                             %高5位10进制矩阵
+% LT_h = reshape(LT_h, LT_H, LT_W);                             %高4位10进制矩阵
 LT_l = bi2de(LT_Bin_L, 'left-msb');
-% LT_l = reshape(LT_l, LT_H, LT_W);                             %低5位10进制矩阵
+% LT_l = reshape(LT_l, LT_H, LT_W);                             %低4位10进制矩阵
 
 % 1. 利用高位图像扰乱低位图像
 LT_l1 = zeros(LT_Len, 1); 
-LT_l1(1) = mod(LT_h(1)+LT_l(1), 32);                        %5位数是32
+LT_l1(1) = mod(LT_h(1)+LT_l(1), 16);                        %4位数是16
 for n = 2: LT_Len
-    temp = mod(LT_h(n) + LT_l(n), 32);
+    temp = mod(LT_h(n) + LT_l(n), 16);
     LT_l1(n) = bitxor(temp, LT_l1(n - 1)); %最后的低位矩阵
 end
 
@@ -139,8 +146,8 @@ for  n = 1: LT_Len
     LT_h1(n) = LT_h(A(n));%置乱后的高位图像
 end 
 
-% 3. 将LT_l1转换为5比特的二进制，再将相邻两位合并转成一个十进制数得到LT_l2，利用序列B对LT_l2进行扩散操作。
-temp = de2bi(LT_l1, 5,'left-msb');
+% 3. 将LT_l1转换为4比特的二进制，再将相邻两位合并转成一个十进制数得到LT_l2，利用序列B对LT_l2进行扩散操作。
+temp = de2bi(LT_l1, 4,'left-msb');
 LT_l2 = zeros(LT_Len / 2, 1);
 for i = 1: 2: LT_Len
     t = [temp(i, :) temp(i + 1, :)];
@@ -148,24 +155,24 @@ for i = 1: 2: LT_Len
 end
 % D_r扩散
 LT_l21 = zeros(LT_Len / 2, 1);
-LT_l21(1) = mod(LT_l2(1) + D_r(1), 1024);
+LT_l21(1) = mod(LT_l2(1) + D_r(1), 256);
 for i = 2: LT_Len / 2
-    temp = mod(LT_l2(i) + D_r(i), 1024);
+    temp = mod(LT_l2(i) + D_r(i), 256);
     LT_l21(i) = bitxor(temp, LT_l21(i - 1));
 end
 % D_c扩散
 LT_l22 = zeros(LT_Len / 2, 1);
-LT_l22(LT_Len / 2) = mod(LT_l21(LT_Len / 2) + D_c(LT_Len / 2), 1024);
+LT_l22(LT_Len / 2) = mod(LT_l21(LT_Len / 2) + D_c(LT_Len / 2), 256);
 for i = LT_Len / 2 - 1: -1: 1
-    temp = mod(LT_l21(i) + D_c(i), 1024);
+    temp = mod(LT_l21(i) + D_c(i), 256);
     LT_l22(i) = bitxor(temp, LT_l22(i + 1));
 end
-% 将10位数恢复成5位数，得到LT_l3
+% 将8位数恢复成4位数，得到LT_l3
 LT_l3 = zeros(LT_Len, 1);
-temp = de2bi(LT_l22, 10,'left-msb');
+temp = de2bi(LT_l22, 8,'left-msb');
 for i = 1: LT_Len / 2
-    LT_l3(i * 2 - 1) = bi2de(temp(i, 1: 5), 'left-msb');
-    LT_l3(i * 2) = bi2de(temp(i, 6: 10), 'left-msb');
+    LT_l3(i * 2 - 1) = bi2de(temp(i, 1: 4), 'left-msb');
+    LT_l3(i * 2) = bi2de(temp(i, 5: 8), 'left-msb');
 end
 
 %% 4. 用LT_l3扰乱LT_h1, 异或得到LT_h2
@@ -180,30 +187,45 @@ G_h = H_L;
 
 LT_h3 = merge_G_H(G_h, H_H)';
 LT_l4 = merge_G_H(G_L,H_l)';
-%% 6. 将LT_h3, LT_l4合并成10位的LT_E
-temp1 = de2bi(LT_h3, 5,'left-msb');
-temp2 = de2bi(LT_l4, 5,'left-msb');
+%% 6. 将LT_h3, LT_l4合并成8位的LT_E
+temp1 = de2bi(LT_h3, 4,'left-msb');
+temp2 = de2bi(LT_l4, 4,'left-msb');
 LT_E = ones(LT_Len, 1);
 for i = 1: LT_Len
     t = [temp1(i, :) temp2(i, :)];
     LT_E(i) = bi2de(t, 'left-msb');
 end
 LT_E = reshape(LT_E, LT_H, LT_W);
+
 suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
 
 %% 加密图像展示
 DC_length = length(DC_Encrytion);
-% suoluetu_E = reshape(suoluetu_E, LT_W * 2, LT_W * 2);
-redundant = mod(DC_length, 10);
-img_E = ones(1, floor(DC_length / 10) + 1);
-for i = 1: floor(DC_length / 10)
-    t = DC_Encrytion(10 * (i - 1) + 1: 10 * i);
+redundant = mod(DC_length, 8);
+img_E = ones(1, (DC_length - redundant) / 8);
+DC_Encrytion_ForShow = DC_Encrytion(1: end - redundant);
+img_E_L = length(img_E);
+for i = 1: img_E_L
+    t = DC_Encrytion(8 * (i - 1) + 1: 8 * i);
     img_E(i) = bi2de(t, 'left-msb');
 end
-img_E(end) = bi2de(DC_Encrytion(end - redundant: end), 'left-msb');
-total_E = [suoluetu_E img_E];
-total_E = reshape(total_E, 300, []);
-imshow(total_E, [])
+img_E = [img_E suoluetu_E];
+W_ForShow = floor(length(img_E) / H);
+img_E_ForShow = img_E(1: H * W_ForShow);
+Entropy(reshape(img_E_ForShow, [H, W_ForShow]))
+
+% for i = 1: length(img_E)
+%     t = DC_Encrytion(8 * (i - 1) + 1: 8 * i);
+%     img_E(i) = bi2de(t, 'left-msb');
+% end
+% t = DC_Encrytion(end - redundant + 1: end);
+% temp = bi2de(t, 'left-msb');
+% img_E = [img_E temp];
+% 
+% img_E = [suoluetu_E img_E];
+% img_E_H = floor(sqrt(img_E));
+% img = reshape(img_E, 419, [])
+
 %% 逆过程
 
 % c = DC_DeCode(x);
