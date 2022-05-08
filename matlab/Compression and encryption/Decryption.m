@@ -55,13 +55,77 @@ LT_H = image_H / 8 / 2;
 LT_W = image_W / 8 / 2;
 
 LT_E = suoluetu(1: LT_H * LT_H);
-DNA_Code = suoluetu(LT_H * LT_H + 1: end);
-%% 解密DNA_Code，得到RT, LB, RB
+seqAfterDNA = suoluetu(LT_H * LT_H + 1: end);
+%% 对RT, LB, RB三个子带进行解密(DNA)
+% 取四个混沌序列中的y和z, 将y的前n项作为DNA加密序列，z的前n项位DNA解密序列，y和z的后n项位DNA异或序列
+nums = LT_H * LT_W;
+n = nums * 3;
+y_E = y(1: n);                                              %DNA编码
+z_D = z(1: n);                                              %DNA解码
+% z_D = y_E;
 
+y_Xor = y(SUM - floor(n / 2) + 1: SUM);                     %DNA异或
+z_Xor = z(SUM - ceil(n / 2) + 1: SUM);
+y_z_Xor = [y_Xor z_Xor];
+Xor_M = sort(y_z_Xor);
 
+for i = 1: nums * 3
+    y_E(i) = mod(round(y_E(i) * 10^4), 8) + 1;
+    z_D(i) = mod(round(z_D(i) * 10^4), 8) + 1;
+    y_z_Xor(i) = mod(round(y_z_Xor(i) * 10^4), 4) + 1;
+    Xor_M(i) = mod(round(Xor_M(i) * 10^5), 256);
+end
 
+%DNA编码
+seqDNA = ones(1, nums * 3 * 4);                             %三个子带内的值均位8位，DNA长度需要乘以4
+Xor_M_DNA = ones(1, nums * 3 * 4);
+% fid=fopen("./DNAafter.bin");
+% DNA_RAW = fread(fid)';
+% fclose(fid);
+% isequal(DNA_RAW, seqAfterDNA)
+% seqAfterDNA = DNA_RAW;
+%%
+for i = 1: nums * 3
+    if i == 1
+        seqDNA(1: 4) = DNAEncoding(seqAfterDNA(i), z_D(i));
+        Xor_M_DNA(1: 4) = DNAEncoding(Xor_M(i), y_E(i));
+    else
+        seqDNA(4 * (i - 1) + 1: 4 * i) = DNAEncoding(seqAfterDNA(i), z_D(i));
+        Xor_M_DNA(4 * (i - 1) + 1: 4 * i) = DNAEncoding(Xor_M(i), y_E(i));
+    end
+end
+%DNA异或
+seqDNA_Xor = ones(1, nums * 3 * 4);
+for i = 1: nums * 3 * 4
+    if i <= n
+        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i));
+    elseif i <= 2 * n
+        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - n));
+    elseif i <= 3 * n
+        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 2*n));
+    else
+        seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 3*n));
+%     else
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 4 * n));
+    end
+end
+%DNA解密
+seqAfterDNA = ones(1, nums * 3);
+for i = 1: nums * 3
+    if i == 1
+        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(1: 4), y_E(i));
+    else
+        seqAfterDNA(i) = DNADecoding(seqDNA_Xor(4 * (i - 1) + 1: 4 * i), y_E(i));
+    end
+end
+seq = seqAfterDNA;
+% fid = fopen('./DNA.bin');
+% DNA_RAW = fread(fid)';
+% fclose(fid);
+% isequal(DNA_RAW, seq)
 
-
-
+%% 解密LT
+%%
+toc
 
 

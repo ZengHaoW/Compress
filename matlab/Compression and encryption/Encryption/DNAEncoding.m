@@ -16,13 +16,13 @@ function [DNA_Code] = DNAEncoding(pixel, nums)
             elseif A(1, i) == 3
                 DNA_Code(1, i) = r(2);          %T
             elseif A(1, i) == 2
-                if nums==3
+                if nums==1
                     DNA_Code(1, i) = r(3);      %C
                 else
                     DNA_Code(1, i) = r(4);      %G
                 end
             else
-                if nums==3
+                if nums==1
                     DNA_Code(1, i) = r(4);      %G
                 else
                     DNA_Code(1, i) = r(3);      %C
@@ -42,7 +42,7 @@ function [DNA_Code] = DNAEncoding(pixel, nums)
                     DNA_Code(1, i) = r(4);      %G
                 end
             else
-                if nums==4
+                if nums==3
                     DNA_Code(1, i) = r(4);      %G
                 else
                     DNA_Code(1, i) = r(3);      %C
