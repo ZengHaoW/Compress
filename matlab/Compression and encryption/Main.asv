@@ -9,9 +9,9 @@ addpath(genpath('./keys'))
 tic
 
 
-imagePath = './testImage/r';
+imagePath = './testImage/5.1.13.tiff';
 %% 获取密钥，计算图像的SHA-256，key为256位，表示为64位的16进制字符串 
-t = [2, 5, 7, 3];
+t = [2, 5, 7, 2];
 [x0, y0, z0, w0] = getkeys(imagePath, t);
 
 
@@ -98,18 +98,40 @@ LT_H = s_H;
 LT_W = s_W;
 LT_Len = LT_H * LT_W;
 %x序列取LT_H个，y序列取LT_W个，相乘得到置乱序列A
-x_P = x(LT_H + 1: LT_H * 2);
-y_P = y(LT_H + 1: LT_H * 2);
-A = x_P' * y_P;
+
+% x_P = x(LT_H + 1: LT_H * 2);
+% y_P = y(LT_H + 1: LT_H * 2);
+% A = x_P' * y_P;
+% A = reshape(A, 1, []);
+
+x_P = x(LT_H + 1: LT_H + LT_H * LT_H);
+y_P = y(LT_H + 1: LT_H + LT_H * LT_H);
+x_P = floor(mod((x_P * 10^10), 1024));
+y_P = floor(mod((y_P * 10^10), 1024));
+
+A = bitxor(x_P, y_P);
 A = reshape(A, 1, []);
-A = mod(floor(A*power(10,15)), 16);
+
+% A = mod(floor(A*power(10,15)), 16);
 A = sort_S(A);
+% A = mod(floor(A*power(10,15)), 1024);
+% S_A = sort(A);
+% [~, A] = ismember(S_A, A);
 %z序列取LT_H个，h序列取LT_W个，相乘得到扩散序列B
-z_P = z(LT_H + 1: LT_H * 2);
-h_P = h(LT_H + 1: LT_H * 2);
-B = z_P' * h_P;
+
+% z_P = z(LT_H + 1: LT_H * 2);
+% h_P = h(LT_H + 1: LT_H * 2);
+% B = z_P' * h_P;
+% B = reshape(B, 1, []);
+% B = mod(floor(B*power(10,16)), 256);
+
+z_P = z(LT_H + 1: LT_H + LT_H * LT_H);
+h_P = h(LT_H + 1: LT_H + LT_H * LT_H);
+z_P = floor(mod((z_P * 10^10), 256));
+h_P = floor(mod((h_P * 10^10), 256));
+B = bitxor(z_P, h_P);
 B = reshape(B, 1, []);
-B = mod(floor(B*power(10,16)), 1024);
+
 D_r = B(1: LT_Len / 2);%用来做行扩散，每行共N个元素
 D_c = B(1 + LT_Len / 2: end);%用来进行列扩散，每列共M个元素
 
@@ -188,17 +210,31 @@ end
 LT_E = reshape(LT_E, LT_H, LT_W);
 
 suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
-
+data_E = [suoluetu_E cell2mat(DC_Encrytion)];
 %% 加密图像展示
-suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, []);
-imshow(suoluetu_E_S)
-DC_len = length(DC_Encrytion);
-DC_image = ones(1, DC_len);
-for i = 1: DC_len
-    DC_image(i) = bit2int(DC_Encrytion{i}', length(DC_Encrytion{i}));
+suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, LT_W * 2);
+
+
+DC_image = cell2mat(DC_Encrytion);
+DC_len = length(DC_image) - mod(length(DC_image), 8);
+DC_image_ForShow = DC_image(1: DC_len);
+image_E = ones(1, DC_len / 8);
+for i = 1: length(image_E)
+    image_E(i) = bit2int(DC_image_ForShow(8 * (i - 1) + 1: 8 * i)', 8);
 end
-image_E = [suoluetu_E DC_image];
-imshow(reshape(image_E, H, []),[])
+temp =  = bit2int(DC_image(end -  mod(length(DC_image), 8) + 1: end)', 8);
+
+image_E = [suoluetu_E image_E];
+
+image_E_1 = image_E(1: length(image_E) - mod(length(image_E), H));
+figure, imshow(LT_E, []);
+Entropy(LT_E)
+figure, imshow(suoluetu_E_S, []);
+Entropy(suoluetu_E_S)
+figure, imshow(reshape(image_E_1, [],H),[]);
+Entropy(reshape(image_E_1, [],H))
+
+% imshow(reshape(image_E, H, []),[])
 %% 逆过程
 
 % c = DC_DeCode(x);

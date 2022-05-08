@@ -4,7 +4,7 @@ function [result] = Diffusion(DC_Code,sequences)
     len = length(DC_Code);
     % 把序列sequences转化位0~255的整数
     sequences = floor(mod((sequences * 10^10), 256));
-    % 把sequences转为2进制
+    % sequences转为2进制
     sequences_bin = de2bi(sequences, 'left-msb');
 
     result = cell(1, len);

@@ -1,9 +1,7 @@
-function [x, y, z, w] = getkeys(imgPath, t)
+function [x, y, z, w] = getkeys(keys, t)
 %GETKEYS 此处显示有关此函数的摘要
 %   此处显示详细说明
-    I = imread(imgPath);
 
-    keys = sha256(I);
     k = ones(1, 32);
     for i = 1: 32
         temp = keys(i * 2 - 1: i * 2);
