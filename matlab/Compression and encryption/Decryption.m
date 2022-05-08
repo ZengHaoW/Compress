@@ -47,10 +47,20 @@ else
         DC_Code{i} = de2bi(DC(i), 8,'left-msb');
     end
 end
-DC_Code = cell2mat(DC_Code);
 % 将DC_Code部分解密
 DC_Code = Diffusion(DC_Code, x);
-c = 1;
+d = DC_DeCode(DC_Code);
+%% 取得缩略图的四个子带LT, RT, LB, RB
+LT_H = image_H / 8 / 2;
+LT_W = image_W / 8 / 2;
+
+LT_E = suoluetu(1: LT_H * LT_H);
+DNA_Code = suoluetu(LT_H * LT_H + 1: end);
+%% 解密DNA_Code，得到RT, LB, RB
+
+
+
+
 
 
 

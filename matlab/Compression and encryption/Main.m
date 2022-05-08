@@ -22,6 +22,7 @@ oneDimension = reshape(normalMatrix,1,[]);
 [H, W] = size(normalMatrix);                                %图片的高宽
 
 afterDC = DC_Code(oneDimension);                            %直流编码，得到的是cell
+% c = DC_DeCode(cell2mat(afterDC));
 
 %% 生成4维混沌序列
 SUM = H * W;                                                %图像总像素个数
@@ -212,12 +213,12 @@ end
 LT_E = reshape(LT_E, LT_H, LT_W);
 
 suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
-data_E = [suoluetu_E cell2mat(DC_Encrytion)];
+data_E = [suoluetu_E DC_Encrytion];
 %% 加密图像展示
 suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, LT_W * 2);
 
 
-DC_image = cell2mat(DC_Encrytion);
+DC_image = DC_Encrytion;
 DC_len = length(DC_image) - mod(length(DC_image), 8);
 DC_image_ForShow = DC_image(1: DC_len);
 image_E = ones(1, DC_len / 8);
@@ -227,7 +228,6 @@ end
 if mod(length(DC_image), 8) > 0
     temp = bit2int(DC_image(end -  mod(length(DC_image), 8) + 1: end)', mod(length(DC_image), 8));
     image_E = [image_E temp];
-    image_E = [image_E mod(length(DC_image), 8)];
 end
 image_E = [suoluetu_E image_E];
 
