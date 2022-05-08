@@ -9,7 +9,7 @@ addpath(genpath('./keys'))
 tic
 
 
-imagePath = './testImage/ruler.512.tiff';
+imagePath = './testImage/r';
 %% 获取密钥，计算图像的SHA-256，key为256位，表示为64位的16进制字符串 
 t = [2, 5, 7, 3];
 [x0, y0, z0, w0] = getkeys(imagePath, t);
@@ -191,7 +191,7 @@ suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
 
 %% 加密图像展示
 suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, []);
-
+imshow(suoluetu_E_S)
 DC_len = length(DC_Encrytion);
 DC_image = ones(1, DC_len);
 for i = 1: DC_len

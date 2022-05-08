@@ -2,23 +2,24 @@ function [result] = Diffusion(DC_Code,sequences)
 %DIFFUSION DC编码后进行扩散，DC_Code是cell
 %   此处显示详细说明
     len = length(DC_Code);
-    s_len = length(sequences);
-    % 把sequences归一化到0~255，且转为二进制
-    s_Max = max(sequences);
-    s_Min = min(sequences);
-    SUM = s_Max - s_Min;
-    if SUM == 0
-        SUM = 1;
-    end
-    seq = ones(1, s_len * 8);
-    for i = 1: s_len
-        sequences(i) = floor(((sequences(i) - s_Min) / SUM) * 255); %归一化到0~255
-        if i == 1
-            seq(1: 8) = de2bi(sequences(i), 'left-msb', 8);
+    % 把序列sequences转化位0~255的整数
+    sequences = floor(mod((sequences * 10^10), 256));
+    % 把sequences转为2进制
+    sequences_bin = de2bi(sequences, 'left-msb');
+
+    result = cell(1, len);
+
+    for i = 1: len
+        t_len = length(DC_Code{i});
+        temp = sequences_bin(i, :);
+        if t_len > 8
+            temp2 = [temp temp];
+            result{i} = bitxor(DC_Code{i}, temp2(end - t_len + 1: end));
         else
-            seq((i - 1) * 8 + 1: i * 8) = de2bi(sequences(i), 'left-msb', 8);%转成二进制
+            result{i} = bitxor(DC_Code{i}, temp(end - t_len + 1: end));
         end
+
     end
-    result = bitxor(DC_Code, seq(1: len));
+
 end
 
