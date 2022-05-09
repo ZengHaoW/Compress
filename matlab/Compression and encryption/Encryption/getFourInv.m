@@ -4,7 +4,7 @@ function [afterTransform] = getFourInv(LT, RT, LB, RB)
     addpath(genpath('../Transform'));
 
     [H, W] = size(LT);
-    suoluetu = ones(H, W);
+    suoluetu = ones(H * 2, W * 2);
 
     suoluetu(1: H, 1: W) = LT;
     suoluetu(H + 1: H * 2, 1: W) = RT;
@@ -12,7 +12,7 @@ function [afterTransform] = getFourInv(LT, RT, LB, RB)
     suoluetu(H + 1: H * 2, W + 1: W * 2) = RB;
 
     thumbnail_8 = splitImageTo8(suoluetu);
-    blockNums = H / 8;
+    blockNums = H * 2 / 8;
 
     for i = 1: blockNums
         for j = 1: blockNums

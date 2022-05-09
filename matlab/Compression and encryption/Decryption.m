@@ -246,13 +246,13 @@ LB = seq(nums + 1: nums * 2);
 LB = reshape(LB, LT_H, LT_W);
 RB = seq(nums * 2 + 1: nums * 3);
 RB = reshape(RB, LT_H, LT_W);
-suoluetu_R = getFourInv(LT, RT, LB, RB);        %getFourInv写错了
+suoluetu_R = getFourInv(LT, RT, LB, RB);        
 
 %% 展示解密图片
-fid = fopen('./suoluetu.bin');
-qwe = fread(fid)';
-fclose(fid);
-isequal(qwe, reshape(suoluetu_R, 1, []))
+% fid = fopen('./suoluetu.bin');
+% qwe = fread(fid)';
+% fclose(fid);
+% isequal(qwe, reshape(suoluetu_R, 1, []))
 
 d = reshape(d, image_H, image_W);
 b = invTransformTotalImage(d,suoluetu_R);

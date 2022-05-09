@@ -24,6 +24,14 @@ a(1,1) = b;
 % a = positionChange(a)
 a = a + 255;
 
-x = transformInv2(a, b)
+x = transformInv2(a, b);
+x == t
+
+[a ,b] = transform(x);
+a(1,1) = b;
+a = a + 255;
+
+x = transformInv2(a, b);
+
 x == t
 
