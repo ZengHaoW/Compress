@@ -13,13 +13,12 @@ data_Path = './encryption.bin';
 fid = fopen(data_Path);
 encryptionData = fread(fid)';
 fclose(fid);
+keys = readcell('./key.txt');
 %% 获取密钥，生成混沌系统的初值
-imagePath = './testImage/lena_gray.bmp';
-t_key = [2, 5, 7, 2];
-I = imread(imagePath);
-keys = sha256(I);
-[x0, y0, z0, w0] = getkeys(keys, t_key);
-last = 4;       %加密数据最后一位是4位，不是八位
+imagePath = keys{7};
+t_key = [keys{1}, keys{2}, keys{3}, keys{4}];
+[x0, y0, z0, w0] = getkeys(keys{5}, t_key);
+last = keys{6};       %加密数据最后一位是4位，不是八位
 image_H = 512;  %提取数据需要原图像的尺寸
 image_W = 512;  
 %% 生成混沌序列
@@ -34,6 +33,7 @@ suoluetu_W = image_W / 8;
 suoluetu_len = suoluetu_H * suoluetu_W;
 
 suoluetu = encryptionData(1: suoluetu_len);
+suoluetu(1: 100) = zeros(1, 100);
 DC = encryptionData(suoluetu_len + 1: end);
 %% DC编码部分转二进制，注意最后一位数的位长
 DC_Code = cell(1, length(DC));
@@ -49,7 +49,7 @@ else
 end
 % 将DC_Code部分解密
 DC_Code = Diffusion(DC_Code, x);
-d = DC_DeCode(DC_Code);                     %d写错了
+
 %% 取得缩略图的四个子带LT, RT, LB, RB
 LT_H = image_H / 8 / 2;
 LT_W = image_W / 8 / 2;
@@ -119,10 +119,10 @@ for i = 1: nums * 3
     end
 end
 seq = seqAfterDNA;      % 解密的RT, LB, RB三个子带
-fid = fopen('./DNA.bin');
-DNA_RAW = fread(fid)';
-fclose(fid);
-isequal(DNA_RAW, seq)
+% fid = fopen('./DNA.bin');
+% DNA_RAW = fread(fid)';
+% fclose(fid);
+% isequal(DNA_RAW, seq)
 
 %% 解密LT_E
 LT_Len = LT_H * LT_W;
@@ -232,10 +232,10 @@ for i = 1: LT_Len
 end
 
 
-fid = fopen('./LT.bin');
-qwe = fread(fid)';
-fclose(fid);
-isequal(qwe, LT')
+% fid = fopen('./LT.bin');
+% qwe = fread(fid)';
+% fclose(fid);
+% isequal(qwe, LT')
 
 %% 获得缩略图
 % LT 是对的， seq也是对的
@@ -253,11 +253,20 @@ suoluetu_R = getFourInv(LT, RT, LB, RB);
 % qwe = fread(fid)';
 % fclose(fid);
 % isequal(qwe, reshape(suoluetu_R, 1, []))
-
+figure, imshow(suoluetu_R,[])
+d = DC_DeCode(DC_Code);                     %d写错了
 d = reshape(d, image_H, image_W);
 b = invTransformTotalImage(d,suoluetu_R);
-imshow(b, [])
+
+figure, imshow(b, [])
+
 bb = readImage(imagePath);
+an = isequal(bb, b);
+if an == 1
+    disp("解密图像和原图像完全一致");
+else
+    disp("解密图像和原图像不一致");
+end
 toc
 
 

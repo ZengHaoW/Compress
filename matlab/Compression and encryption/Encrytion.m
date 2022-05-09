@@ -11,30 +11,34 @@ tic
 
 
 %% 获取密钥，计算图像的SHA-256，key为256位，表示为64位的16进制字符串 
-imagePath = './testImage/lena_gray.bmp';
+imagePath = './testImage/lena.tiff';
 t_key = [2, 5, 7, 2];
 I = imread(imagePath);
 keys = sha256(I);
 [x0, y0, z0, w0] = getkeys(keys, t_key);
 
+
+%% 差值变换
+% imshow(reshape(image_E, H, []),[])
 [normalMatrix, suoluetu] = transformTotalImage(imagePath);
 oneDimension = reshape(normalMatrix,1,[]);
-fid=fopen("./suoluetu.bin","wb");
-fwrite(fid,reshape(suoluetu, 1,[]),'uint8');
-fclose(fid);
+% fid=fopen("./suoluetu.bin","wb");
+% fwrite(fid,reshape(suoluetu, 1,[]),'uint8');
+% fclose(fid);
 [H, W] = size(normalMatrix);                                %图片的高宽
 
 afterDC = DC_Code(oneDimension);                            %直流编码，得到的是cell
+% afterDC = cell(1, 262144);
 % c = DC_DeCode(cell2mat(afterDC));
 
 %% 生成4维混沌序列
 SUM = H * W;                                                %图像总像素个数
-
+toc
 %根据初值，求解Chen氏超混沌系统，得到四个混沌序列x, y, z, h, 长度均为SUM
 [x, y, z, h] = generateSequences(x0, y0, z0, w0, SUM);
 %% 对DC编码后的部分进行混沌系统的扩散
 DC_Encrytion = Diffusion(afterDC, x);
-
+toc
 %% 对缩略图进行变换，取得四个子带LT, RT, LB, RB
 [LT, RT, LB, RB] = getFour(suoluetu);
 [s_H, s_W] = size(RT);                                      %子块的长宽
@@ -44,9 +48,9 @@ seq = ones(1, nums * 3);                                    %将RT, LB, RB三个
 seq(1: nums) = reshape(RT, 1, []);
 seq(nums + 1: nums * 2) = reshape(LB, 1, []);
 seq(nums * 2 + 1: nums * 3) = reshape(RB, 1, []);
-fid=fopen("./DNA.bin","wb");
-fwrite(fid,seq','uint8');
-fclose(fid);
+% fid=fopen("./DNA.bin","wb");
+% fwrite(fid,seq','uint8');
+% fclose(fid);
 
 
 %% 对三个子带进行DNA加密                             
@@ -105,10 +109,11 @@ for i = 1: nums * 3
     end
 end
 
-qqqq = seqAfterDNA;
-fid=fopen("./DNAafter.bin","wb");
-fwrite(fid,qqqq','uint8');
-fclose(fid);
+% qqqq = seqAfterDNA;
+% fid=fopen("./DNAafter.bin","wb");
+% fwrite(fid,qqqq','uint8');
+% fclose(fid);
+toc
 %% 对LT进行高低位加密   H * W为原图像的尺寸, LT尺寸为 H / 16 * W / 16  LT各个元素为8位数, 全程计算为列向量
 LT_H = s_H;
 LT_W = s_W;
@@ -151,9 +156,9 @@ B = reshape(B, 1, []);
 D_r = B(1: LT_Len / 2);%用来做行扩散，每行共N个元素
 D_c = B(1 + LT_Len / 2: end);%用来进行列扩散，每列共M个元素
 
-fid=fopen("./LT.bin","wb");
-fwrite(fid,reshape(LT, 1,[]),'uint8');
-fclose(fid);
+% fid=fopen("./LT.bin","wb");
+% fwrite(fid,reshape(LT, 1,[]),'uint8');
+% fclose(fid);
 
 % 将图像分为高4位和低4位，分别用十进制表示
 LT_Bin = de2bi(LT, 8,'left-msb');                            %按列转换，每一行为8位二进制
@@ -250,7 +255,7 @@ image_E = ones(1, DC_len / 8);
 for i = 1: length(image_E)
     image_E(i) = bit2int(DC_image_ForShow(8 * (i - 1) + 1: 8 * i)', 8);
 end
-last = mod(length(DC_image), 8)
+last = mod(length(DC_image), 8);    %密钥之一
 if mod(length(DC_image), 8) > 0
     temp = bit2int(DC_image(end -  mod(length(DC_image), 8) + 1: end)', mod(length(DC_image), 8));
     image_E = [image_E temp];
@@ -258,27 +263,31 @@ end
 image_E = [suoluetu_E image_E];
 
 
-
+%% 结果展示
 image_E_1 = image_E(1: length(image_E) - mod(length(image_E), H));
-figure, imshow(LT_E, []);
-Entropy(LT_E)
-figure, imshow(suoluetu_E_S, []);
+% figure, imshow(LT_E, []);           %LT加密图像（高低位）
+% Entropy(LT_E)
+% figure, imshow(suoluetu_E_S, []);   %缩略图加密图像
+% imwrite(uint8(suoluetu_E_S), './testImage/black_suoluetu_E.tiff','Compression','none');
+II = readImage(imagePath);
+Entropy(II)
 Entropy(suoluetu_E_S)
-figure, imshow(reshape(image_E_1, [],H),[]);
+% figure, imshow(reshape(image_E_1, [],H),[]);    %总加密图像
+% imwrite(uint8(reshape(image_E_1, [],H)), './testImage/black_E.tiff','Compression','none');
 Entropy(reshape(image_E_1, [],H))
 %% 保存数据
 % 保存加密图像
 fid=fopen("./encryption.bin","wb");
 fwrite(fid,image_E','uint8');
 fclose(fid);
+%% 保存密钥
+a = cell(1, 4);
+a{1} = t_key;
+a{2} = keys;
+a{3} = last;
+a{4} = imagePath;
+writecell(a, 'key.txt');
 
-%保存密钥
-% fid=fopen("./key.txt","wb");
-% fwrite(fid,join(num2str(t_key))','char');
-% fwrite(fid,keys','char');
-% fclose(fid);
-
-% imshow(reshape(image_E, H, []),[])
 %% 逆过程
 
 % c = DC_DeCode(x);
