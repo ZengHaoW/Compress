@@ -19,6 +19,9 @@ keys = sha256(I);
 
 [normalMatrix, suoluetu] = transformTotalImage(imagePath);
 oneDimension = reshape(normalMatrix,1,[]);
+fid=fopen("./suoluetu.bin","wb");
+fwrite(fid,reshape(suoluetu, 1,[]),'uint8');
+fclose(fid);
 [H, W] = size(normalMatrix);                                %图片的高宽
 
 afterDC = DC_Code(oneDimension);                            %直流编码，得到的是cell
@@ -148,6 +151,10 @@ B = reshape(B, 1, []);
 D_r = B(1: LT_Len / 2);%用来做行扩散，每行共N个元素
 D_c = B(1 + LT_Len / 2: end);%用来进行列扩散，每列共M个元素
 
+fid=fopen("./LT.bin","wb");
+fwrite(fid,reshape(LT, 1,[]),'uint8');
+fclose(fid);
+
 % 将图像分为高4位和低4位，分别用十进制表示
 LT_Bin = de2bi(LT, 8,'left-msb');                            %按列转换，每一行为8位二进制
 LT_Bin_H = LT_Bin(:, 5: 8);
@@ -171,6 +178,8 @@ for  n = 1: LT_Len
     LT_h1(n) = LT_h(A(n));%置乱后的高位图像
 end 
 
+
+
 % 3. 将LT_l1转换为4比特的二进制，再将相邻两位合并转成一个十进制数得到LT_l2，利用序列B对LT_l2进行扩散操作。
 temp = de2bi(LT_l1, 4,'left-msb');
 LT_l2 = zeros(LT_Len / 2, 1);
@@ -178,6 +187,9 @@ for i = 1: 2: LT_Len
     t = [temp(i, :) temp(i + 1, :)];
     LT_l2((i + 1) / 2) = bi2de(t, 'left-msb');
 end
+
+
+
 % D_r扩散
 LT_l21 = zeros(LT_Len / 2, 1);
 LT_l21(1) = mod(LT_l2(1) + D_r(1), 256);
@@ -185,6 +197,7 @@ for i = 2: LT_Len / 2
     temp = mod(LT_l2(i) + D_r(i), 256);
     LT_l21(i) = bitxor(temp, LT_l21(i - 1));
 end
+
 % D_c扩散
 LT_l22 = zeros(LT_Len / 2, 1);
 LT_l22(LT_Len / 2) = mod(LT_l21(LT_Len / 2) + D_c(LT_Len / 2), 256);
@@ -192,6 +205,7 @@ for i = LT_Len / 2 - 1: -1: 1
     temp = mod(LT_l21(i) + D_c(i), 256);
     LT_l22(i) = bitxor(temp, LT_l22(i + 1));
 end
+
 % 将8位数恢复成4位数，得到LT_l3
 LT_l3 = zeros(LT_Len, 1);
 temp = de2bi(LT_l22, 8,'left-msb');
@@ -212,6 +226,7 @@ G_h = H_L;
 
 LT_h3 = merge_G_H(G_h, H_H)';
 LT_l4 = merge_G_H(G_L,H_l)';
+
 %% 6. 将LT_h3, LT_l4合并成8位的LT_E
 temp1 = de2bi(LT_h3, 4,'left-msb');
 temp2 = de2bi(LT_l4, 4,'left-msb');
@@ -235,6 +250,7 @@ image_E = ones(1, DC_len / 8);
 for i = 1: length(image_E)
     image_E(i) = bit2int(DC_image_ForShow(8 * (i - 1) + 1: 8 * i)', 8);
 end
+last = mod(length(DC_image), 8)
 if mod(length(DC_image), 8) > 0
     temp = bit2int(DC_image(end -  mod(length(DC_image), 8) + 1: end)', mod(length(DC_image), 8));
     image_E = [image_E temp];
