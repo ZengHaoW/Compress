@@ -3,5 +3,8 @@ function [imageMatrix] = readImage(imagePath)
 %   读取图片  (h, w, )
     imageMatrix = imread(imagePath);
     imageMatrix = double(imageMatrix);
+
+    %%临时
+%     imageMatrix(3,3) = bitxor(255, imageMatrix(3,3));
 end
 

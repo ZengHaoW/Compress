@@ -17,6 +17,8 @@ keys = readcell('./key.txt');
 %% 获取密钥，生成混沌系统的初值
 imagePath = keys{7};
 t_key = [keys{1}, keys{2}, keys{3}, keys{4}];
+% t_key(1) = 2;
+% keys{5}(end - 5:end - 5) = '0';
 [x0, y0, z0, w0] = getkeys(keys{5}, t_key);
 last = keys{6};       %加密数据最后一位是4位，不是八位
 image_H = 512;  %提取数据需要原图像的尺寸
@@ -33,22 +35,19 @@ suoluetu_W = image_W / 8;
 suoluetu_len = suoluetu_H * suoluetu_W;
 
 suoluetu = encryptionData(1: suoluetu_len);
-suoluetu(1: 100) = zeros(1, 100);
+%% 剪裁和噪声
+% 1. 剪裁
+% nosiy_len = round(0.5 * suoluetu_len);
+% suoluetu(1: 256) = 0;
+% suoluetu(1 + 1024: 256 + 1024) = 0;
+% suoluetu(1 + 1024 * 2 + 256: 256 + 1024 * 2) = 0;
+% suoluetu(1 + 1024* 3 + 256: 256 + 1024* 3) = 0;
+% 2. 噪声
+suoluetu = double(imnoise(uint8(suoluetu),'salt & pepper',0.3));
+
+%%
 DC = encryptionData(suoluetu_len + 1: end);
-%% DC编码部分转二进制，注意最后一位数的位长
-DC_Code = cell(1, length(DC));
-if last > 0
-    DC_Code{end} = de2bi(DC(end), last,'left-msb');
-    for i = 1: length(DC) - 1
-        DC_Code{i} = de2bi(DC(i), 8,'left-msb');
-    end
-else
-    for i = 1: length(DC)
-        DC_Code{i} = de2bi(DC(i), 8,'left-msb');
-    end
-end
-% 将DC_Code部分解密
-DC_Code = Diffusion(DC_Code, x);
+
 
 %% 取得缩略图的四个子带LT, RT, LB, RB
 LT_H = image_H / 8 / 2;
@@ -254,19 +253,41 @@ suoluetu_R = getFourInv(LT, RT, LB, RB);
 % fclose(fid);
 % isequal(qwe, reshape(suoluetu_R, 1, []))
 figure, imshow(suoluetu_R,[])
+imwrite(uint8(suoluetu_R), './testImage/lena_suoluetu_anti_noise_0.3.tiff','Compression','none');
+toc
+%% DC编码部分转二进制，注意最后一位数的位长
+DC_Code = cell(1, length(DC));
+if last > 0
+    DC_Code{end} = de2bi(DC(end), last,'left-msb');
+    for i = 1: length(DC) - 1
+        DC_Code{i} = de2bi(DC(i), 8,'left-msb');
+    end
+else
+    for i = 1: length(DC)
+        DC_Code{i} = de2bi(DC(i), 8,'left-msb');
+    end
+end
+% 将DC_Code部分解密
+toc
+DC_Code = Diffusion(DC_Code, x);
+toc
 d = DC_DeCode(DC_Code);                     %d写错了
+toc
 d = reshape(d, image_H, image_W);
+
+% imshow(d, [])
 b = invTransformTotalImage(d,suoluetu_R);
 
 figure, imshow(b, [])
 
 bb = readImage(imagePath);
+imwrite(uint8(b), './testImage/lena_anti_noise_0.3.tiff','Compression','none');
 an = isequal(bb, b);
 if an == 1
     disp("解密图像和原图像完全一致");
 else
     disp("解密图像和原图像不一致");
 end
-toc
+
 
 
