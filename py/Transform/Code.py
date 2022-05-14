@@ -38,7 +38,7 @@ def DC_Code(block):  # DC编码
         for j in range(temp.shape[1]):
             k = abs(temp[i][j])
             if k == 0:
-                result[i][j] = "00" + "0"  # 3 + 1 = 5
+                result[i][j] = "00"  # 3 + 1 = 5
             elif k < 2:
                 if temp[i][j] < 0:
                     result[i][j] = '{:01b}'.format(k ^ 0b1)

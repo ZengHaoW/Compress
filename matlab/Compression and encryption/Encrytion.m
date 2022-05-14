@@ -160,7 +160,7 @@ D_c = B(1 + LT_Len / 2: end);%用来进行列扩散，每列共M个元素
 % fid=fopen("./LT.bin","wb");
 % fwrite(fid,reshape(LT, 1,[]),'uint8');
 % fclose(fid);
-toc
+
 % 将图像分为高4位和低4位，分别用十进制表示
 LT_Bin = de2bi(LT, 8,'left-msb');                            %按列转换，每一行为8位二进制
 LT_Bin_H = LT_Bin(:, 5: 8);
@@ -246,6 +246,19 @@ LT_E = reshape(LT_E, LT_H, LT_W);
 suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
 data_E = [suoluetu_E DC_Encrytion];
 toc
+%% 计算比特数，算压缩率
+DC_bit_length = length(DC_Encrytion);
+suoluetu_E_bit_length = length(suoluetu_E) * 8;
+jiami_bit_length = DC_bit_length + suoluetu_E_bit_length;
+yuanshi_bit_length = H * W * 8;
+disp('缩略图比特数：')
+suoluetu_E_bit_length
+disp('加密图像总比特数：')
+jiami_bit_length
+disp('原始图像比特数：')
+yuanshi_bit_length
+disp('原始比特数/加密总比特数：')
+(yuanshi_bit_length / jiami_bit_length)
 %% 加密图像展示
 suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, LT_W * 2);
 
@@ -265,6 +278,8 @@ end
 image_E = [suoluetu_E image_E];
 toc
 
+
+
 %% 结果展示
 image_E_1 = image_E(1: length(image_E) - mod(length(image_E), H));
 % figure, imshow(LT_E, []);           %LT加密图像（高低位）
@@ -272,11 +287,11 @@ image_E_1 = image_E(1: length(image_E) - mod(length(image_E), H));
 % figure, imshow(suoluetu_E_S, []);   %缩略图加密图像
 % imwrite(uint8(suoluetu_E_S), './testImage/lena_suoluetu_change1Pixel_E.tiff','Compression','none');
 II = readImage(imagePath);
-Entropy(II)
-Entropy(suoluetu_E_S)
+% Entropy(II)
+% Entropy(suoluetu_E_S)
 % figure, imshow(reshape(image_E_1, [],H),[]);    %总加密图像
 % imwrite(uint8(reshape(image_E_1, [],H)), './testImage/lena_change1Pixel_E.tiff','Compression','none');
-Entropy(reshape(image_E_1, [],H))
+% Entropy(reshape(image_E_1, [],H))
 %% 保存数据
 % 保存加密图像
 fid=fopen("./encryption.bin","wb");
@@ -300,4 +315,3 @@ writecell(a, 'key.txt');
 
 %% 程序运行时间与各项指标
 toc
-%disp(['运行时间: ',num2str(toc)]);

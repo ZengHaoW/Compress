@@ -43,7 +43,7 @@ suoluetu = encryptionData(1: suoluetu_len);
 % suoluetu(1 + 1024 * 2 + 256: 256 + 1024 * 2) = 0;
 % suoluetu(1 + 1024* 3 + 256: 256 + 1024* 3) = 0;
 % 2. 噪声
-suoluetu = double(imnoise(uint8(suoluetu),'salt & pepper',0.3));
+% suoluetu = double(imnoise(uint8(suoluetu),'salt & pepper',0.3));
 
 %%
 DC = encryptionData(suoluetu_len + 1: end);
@@ -247,6 +247,8 @@ RB = seq(nums * 2 + 1: nums * 3);
 RB = reshape(RB, LT_H, LT_W);
 suoluetu_R = getFourInv(LT, RT, LB, RB);        
 
+
+
 %% 展示解密图片
 % fid = fopen('./suoluetu.bin');
 % qwe = fread(fid)';
@@ -281,7 +283,7 @@ b = invTransformTotalImage(d,suoluetu_R);
 figure, imshow(b, [])
 
 bb = readImage(imagePath);
-imwrite(uint8(b), './testImage/lena_anti_noise_0.3.tiff','Compression','none');
+% imwrite(uint8(b), './testImage/lena_anti_noise_0.3.tiff','Compression','none');
 an = isequal(bb, b);
 if an == 1
     disp("解密图像和原图像完全一致");
