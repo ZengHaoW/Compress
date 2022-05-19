@@ -11,5 +11,7 @@ clear;clc;
 % plot(x,z)
 % plot(x,w)
 tic
-[x, y, z ,w] = generateSequences(0.3,-0.4,1.2,1, 256*256);
+[x, y, z ,w] = generateSequences(0.222,0.122, 0.55,0.22, 256*256);
+% x, y, z, w
+% +-30,  +-30, 0-45, +-200
 toc

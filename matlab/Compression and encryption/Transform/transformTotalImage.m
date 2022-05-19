@@ -3,6 +3,7 @@ function [normalMatrix,thumbnail] = transformTotalImage(imagePath)
 %   得到计算后结果imageMatrix_8, 访问缩略图thumbnail,normalMatrix为imageMatrix_8合并
 %   imageMatrix_8（抛去缩略图，需要{i, j}访问, 每个imageMatrix_8{i， j}为8*8的矩阵。
     imageMatrix = readImage(imagePath);
+    imageMatrix(1,1) = imageMatrix(1,1) - 1;
     imageMatrix_8 = splitImageTo8(imageMatrix);
     [H, ~] = size(imageMatrix);
     thumbnailSzie = H / 8;

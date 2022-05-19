@@ -5,7 +5,7 @@ clc;
 clear;
 %读取更改原图一个像素点后的加密图
 
-image1=imread('./testImage/lena_change1Pixel_E.tiff');             %读取图像信息
+image1=imread('./testImage/peppers/peppers_suoluetu_E_change1P.tiff');             %读取图像信息
 % image1=imread('../原始、加密、解密图片/辣椒/改变一个像素加密后的peppers.png','png');             %读取图像信息
 % image1=imread('../原始、加密、解密图片/狒狒/改变一个像素加密后的baboon.png','png');             %读取图像信息
 % image1=imread('../原始、加密、解密图片/飞机/改变一个像素加密后的airplane.png','png');             %读取图像信息
@@ -16,7 +16,7 @@ I1=image1;
 I2=image1;
 I3=image1;
 %读取没有更改原图的加密图
-image2=imread('./testImage/lena_E.tiff');              %读取图像信息
+image2=imread('./testImage/peppers/peppers_suoluetu_E.tiff');              %读取图像信息
 % image2=imread('../原始、加密、解密图片/辣椒/加密后的peppers.png','png');              %读取图像信息
 % image2=imread('../原始、加密、解密图片/狒狒/加密后的baboon.png','png');              %读取图像信息
 % image2=imread('../原始、加密、解密图片/飞机/加密后的airplane.png','png');              %读取图像信息

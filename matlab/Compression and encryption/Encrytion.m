@@ -11,9 +11,10 @@ tic
 
 
 %% 获取密钥，计算图像的SHA-256，key为256位，表示为64位的16进制字符串 
-imagePath = './testImage/lena.tiff';
+imagePath = './testImage/5.3.01.tiff';
 t_key = [2, 5, 7, 2];
 I = imread(imagePath);
+I(1,1) = I(1, 1) - 1;
 keys = sha256(I);
 
 [x0, y0, z0, w0] = getkeys(keys, t_key);
@@ -41,6 +42,7 @@ SUM = H * W;                                                %图像总像素个�
 DC_Encrytion = Diffusion(afterDC, x);
 
 %% 对缩略图进行变换，取得四个子带LT, RT, LB, RB
+% suoluetu(1,1) = suoluetu(1,1) - 1;
 [LT, RT, LB, RB] = getFour(suoluetu);
 [s_H, s_W] = size(RT);                                      %子块的长宽
 nums = s_H * s_H;                                           %子块的像素个数
@@ -87,15 +89,20 @@ for i = 1: nums * 3
 end
 %DNA异或
 seqDNA_Xor = ones(1, nums * 3 * 4);
-for i = 1: nums * 3 * 4
+seqDNA_Xor(1) = DNA_diffusion(seqDNA(1), Xor_M_DNA(1), y_z_Xor(1));
+for i = 2: nums * 3 * 4
     if i <= n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i));
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA_Xor(i), seqDNA_Xor(i-1), y_z_Xor(i));
     elseif i <= 2 * n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - n));
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA_Xor(i), seqDNA_Xor(i-n), y_z_Xor(i - n));
     elseif i <= 3 * n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 2*n));
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA_Xor(i), seqDNA_Xor(i-2*n), y_z_Xor(i - 2*n));
     else
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 3*n));
+%         seqDNA_Xor(i) = DNA_diffusion(seqDNA_Xor(i), seqDNA_Xor(i-3*n), y_z_Xor(i - 3*n));
 %     else
 %         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - 4 * n));
     end
@@ -244,6 +251,24 @@ end
 LT_E = reshape(LT_E, LT_H, LT_W);
 
 suoluetu_E = [reshape(LT_E, 1, []) seqAfterDNA];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 data_E = [suoluetu_E DC_Encrytion];
 toc
 %% 计算比特数，算压缩率
@@ -262,7 +287,6 @@ disp('原始比特数/加密总比特数：')
 %% 加密图像展示
 suoluetu_E_S = reshape(suoluetu_E, LT_H * 2, LT_W * 2);
 
-
 DC_image = DC_Encrytion;
 DC_len = length(DC_image) - mod(length(DC_image), 8);
 DC_image_ForShow = DC_image(1: DC_len);
@@ -276,7 +300,7 @@ if mod(length(DC_image), 8) > 0
     image_E = [image_E temp];
 end
 image_E = [suoluetu_E image_E];
-toc
+
 
 
 
@@ -284,11 +308,12 @@ toc
 image_E_1 = image_E(1: length(image_E) - mod(length(image_E), H));
 % figure, imshow(LT_E, []);           %LT加密图像（高低位）
 % Entropy(LT_E)
-% figure, imshow(suoluetu_E_S, []);   %缩略图加密图像
-% imwrite(uint8(suoluetu_E_S), './testImage/lena_suoluetu_change1Pixel_E.tiff','Compression','none');
-II = readImage(imagePath);
+figure, imshow(suoluetu_E_S, []);   %缩略图加密图像
+imwrite(uint8(suoluetu_E_S), './testImage/5.3.01/5.3.01_suoluetu_E_change1P.tiff','Compression','none');
+% II = readImage('./testImage/black/black_suoluetu.tiff');
 % Entropy(II)
-% Entropy(suoluetu_E_S)
+disp('缩略图信息熵：')
+Entropy(suoluetu_E_S)
 % figure, imshow(reshape(image_E_1, [],H),[]);    %总加密图像
 % imwrite(uint8(reshape(image_E_1, [],H)), './testImage/lena_change1Pixel_E.tiff','Compression','none');
 % Entropy(reshape(image_E_1, [],H))

@@ -23,7 +23,12 @@ clear;clc;
 % 
 % imwrite(uint8(key1-key2), './testImage/lena_suoluetu_key(2-1)_E.tiff','Compression','none');
 
-a = uint8(ones(3000, 4000) * 255);
-imwrite(a, './white.jpg')
+I1 = imread('./testImage/5.3.01/5.3.01_suoluetu_E_change1P.tiff');
+I2 = imread('./testImage/5.3.01/5.3.01_suoluetu_E.tiff');
+[npcr, uaci] = NPCR_UACI(I1, I2)
 
-
+% I1 = imread('./testImage/peppers.tiff');
+% I2 = I1;
+% I2(1,1) = I2(1,1) - 1;
+% sha1 = sha256(I1);
+% sha1 = sha256(I2);

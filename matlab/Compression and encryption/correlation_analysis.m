@@ -9,23 +9,11 @@
 计算对角线相关性时，选择每个点的相邻的右下方的点。
 %}
 clear;clc;
-I=imread('./testImage/lena.tiff');         %读取图像信息
-% I=imread('../原始、加密、解密图片/辣椒/peppers.png','png');       %读取图像信息，辣椒
-% I=imread('../原始、加密、解密图片/狒狒/baboon.png','png');         %读取图像信息，狒狒
-% I=imread('../原始、加密、解密图片/飞机/airplane.png','png');         %读取图像信息，飞机
-% I=imread('../原始、加密、解密图片/4.1.05房子/4.1.05.tiff','tiff');         %读取图像信息
-% I=imread('../原始、加密、解密图片/4.2.06小船/4.2.06.tiff','tiff');         %读取图像信息
-% I=imread('../原始、加密、解密图片/汽车/house.tiff','tiff');         %读取图像信息
-% I=imread('../原始、加密、解密图片/城堡/kodim08.png','png');         %读取图像信息
+I=imread('./testImage/lena/lena_suoluetu.tiff');         %读取图像信息
 
-J1=imread('./testImage/lena_E.tiff');             %读取图像信息
-% J1=imread('../原始、加密、解密图片/辣椒/加密后的peppers.png','png');       %读取图像信息，辣椒
-% J1=imread('../原始、加密、解密图片/狒狒/加密后的baboon.png','png');         %读取图像信息，狒狒
-% J1=imread('../原始、加密、解密图片/飞机/加密后的airplane.png','png');         %读取图像信息，飞机
-% J1=imread('../原始、加密、解密图片/4.1.05房子/加密后的4.1.05.png','png');         %读取图像信息
-% J1=imread('../原始、加密、解密图片/4.2.06小船/加密后的4.2.06.png','png');         %读取图像信息
-% J1=imread('../原始、加密、解密图片/汽车/加密后的house.png','png');         %读取图像信息
-% J1=imread('../原始、加密、解密图片/城堡/加密后的kodim08.png','png');         %读取图像信息
+
+J1=I;             %读取图像信息
+
 I = J1;
 I1=I;        %R
 I2=I;        %G
@@ -34,7 +22,7 @@ Q_R=I;
 Q_G=I;
 Q_B=I;
 [M,N]=size(I1);                      %将图像的行列赋值给M,N
-NN=10000;    %随机取5000对像素点
+NN=2000;    %随机取5000对像素点
 x1=ceil(rand(1,NN)*(M-1));      %生成5000个1~M-1的随机整数作为行
 y1=ceil(rand(1,NN)*(N-1));      %生成5000个1~N-1的随机整数作为列
 %预分配内存
@@ -196,7 +184,7 @@ set(gca,'XTick',0:15:255);
 set(gca,'YTick',0:15:255);
 frame = getframe(R);
 R_original_Diagonal=frame2im(frame);
-imwrite(R_original_Diagonal,'./testImage/lena加密前对角.png','png');
+imwrite(R_original_Diagonal,'./testImage/lena/lena_suoluetu加密前对角.png','png');
 % imwrite(R_original_Diagonal,'../相邻像素相关性分析图片/辣椒/加密前R通道对角线相关性点图.png','png');
 % imwrite(R_original_Diagonal,'../相邻像素相关性分析图片/狒狒/加密前R通道对角线相关性点图.png','png');
 % imwrite(R_original_Diagonal,'../相邻像素相关性分析图片/飞机/加密前R通道对角线相关性点图.png','png');

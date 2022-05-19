@@ -6,7 +6,7 @@ addpath(genpath('./Transform'));
 addpath(genpath('./Encryption'));
 addpath(genpath('./Encoding'));
 addpath(genpath('./keys'))
-tic
+
 
 %% 读取加密数据
 data_Path = './encryption.bin';
@@ -19,6 +19,7 @@ imagePath = keys{7};
 t_key = [keys{1}, keys{2}, keys{3}, keys{4}];
 % t_key(1) = 2;
 % keys{5}(end - 5:end - 5) = '0';
+tic
 [x0, y0, z0, w0] = getkeys(keys{5}, t_key);
 last = keys{6};       %加密数据最后一位是4位，不是八位
 image_H = 512;  %提取数据需要原图像的尺寸
@@ -38,12 +39,12 @@ suoluetu = encryptionData(1: suoluetu_len);
 %% 剪裁和噪声
 % 1. 剪裁
 % nosiy_len = round(0.5 * suoluetu_len);
-% suoluetu(1: 256) = 0;
+% suoluetu(length(suoluetu) / 4: length(suoluetu) / 4 * 2) = 255;
 % suoluetu(1 + 1024: 256 + 1024) = 0;
 % suoluetu(1 + 1024 * 2 + 256: 256 + 1024 * 2) = 0;
 % suoluetu(1 + 1024* 3 + 256: 256 + 1024* 3) = 0;
 % 2. 噪声
-% suoluetu = double(imnoise(uint8(suoluetu),'salt & pepper',0.3));
+% suoluetu = double(imnoise(uint8(suoluetu),'salt & pepper',0.1));
 
 %%
 DC = encryptionData(suoluetu_len + 1: end);
@@ -95,9 +96,11 @@ for i = 1: nums * 3
 end
 %DNA异或
 seqDNA_Xor = ones(1, nums * 3 * 4);
+
 for i = 1: nums * 3 * 4
     if i <= n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i));
+        
     elseif i <= 2 * n
         seqDNA_Xor(i) = DNA_diffusion(seqDNA(i), Xor_M_DNA(i), y_z_Xor(i - n));
     elseif i <= 3 * n
@@ -255,7 +258,7 @@ suoluetu_R = getFourInv(LT, RT, LB, RB);
 % fclose(fid);
 % isequal(qwe, reshape(suoluetu_R, 1, []))
 figure, imshow(suoluetu_R,[])
-imwrite(uint8(suoluetu_R), './testImage/lena_suoluetu_anti_noise_0.3.tiff','Compression','none');
+imwrite(uint8(suoluetu_R), './testImage/black/black_suoluetu.tiff','Compression','none');
 toc
 %% DC编码部分转二进制，注意最后一位数的位长
 DC_Code = cell(1, length(DC));
