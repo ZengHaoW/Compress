@@ -22,7 +22,7 @@ clear;clc;
 % imshow(key1-key2)
 % 
 % imwrite(uint8(key1-key2), './testImage/lena_suoluetu_key(2-1)_E.tiff','Compression','none');
-
+%% NPCR UACI
 I1 = imread('./testImage/5.3.01/5.3.01_suoluetu_E_change1P.tiff');
 I2 = imread('./testImage/5.3.01/5.3.01_suoluetu_E.tiff');
 [npcr, uaci] = NPCR_UACI(I1, I2)
