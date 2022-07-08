@@ -9,7 +9,7 @@
 计算对角线相关性时，选择每个点的相邻的右下方的点。
 %}
 clear;clc;
-I=imread('./testImage/lena/lena_suoluetu.tiff');         %读取图像信息
+I=imread('./data/black/suoluetu_E.tiff');         %读取图像信息
 
 
 J1=I;             %读取图像信息

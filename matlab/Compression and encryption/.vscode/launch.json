@@ -1,0 +1,26 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+
+    {
+        "type": "OctaveDebugger",
+        "request": "launch",
+        "name": "Execute selected file.",
+        "program": "lalalal",
+        "octave": "C:\\Program Files\\GNU Octave\\Octave-7.1.0\\mingw64\\bin\\octave-cli.exe",
+        "sourceFolder": "${workspaceFolder}"
+    },
+        {
+            "type": "OctaveDebugger",
+            "request": "launch",
+            "name": "lalalal",
+            "program": "lalalal",
+            "octave": "C:\\Program Files\\GNU Octave\\Octave-7.1.0\\mingw64\\bin\\octave-cli.exe",
+            "sourceFolder": "${workspaceFolder}"
+        }
+    ]
+}

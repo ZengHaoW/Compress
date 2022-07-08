@@ -1,5 +1,5 @@
 function [DNA_Code] = DNAEncoding(pixel, nums)
-%DNAENCODING 根据nums的值对pixel（1*1）进行DNA编码（1*5） pixel为10位数
+%DNAENCODING 根据nums的值对pixel（1*1）进行DNA编码（1*4） pixel为8位数
 %   此处显示详细说明
     a1 = bitand(pixel, 192) / 64; % 取第五和第六比特面
     a2 = bitand(pixel, 48) / 16;  % 取第三和第四比特面

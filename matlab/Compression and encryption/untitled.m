@@ -6,12 +6,12 @@ clc;clear;
 计算垂直相关性时，选择每个点的相邻的下方的点；
 计算对角线相关性时，选择每个点的相邻的右下方的点。
 %}
-I=imread('./testImage/lena/lena_suoluetu_E.tiff'); 
+I=imread('./data/Airplane (U-2)/suoluetu_E.tiff'); 
 I = double(I);
 [M, N] = size(I);
-NN=2000;    %随机取5000对像素点
-x1=ceil(rand(1,NN)*(M-1));      %生成5000个1~M-1的随机整数作为行
-y1=ceil(rand(1,NN)*(N-1));      %生成5000个1~N-1的随机整数作为列
+NN=2000;    %随机取NN对像素点
+x1=ceil(rand(1,NN)*(M-1));      %生成NN个1~M-1的随机整数作为行
+y1=ceil(rand(1,NN)*(N-1));      %生成NN个1~N-1的随机整数作为列
 %预分配内存
 XX_R_SP=zeros(1,NN);YY_R_SP=zeros(1,NN);        %水平
 
@@ -34,13 +34,13 @@ for i=1:NN
   
 end
 %水平
-figure;scatter(XX_R_SP,YY_R_SP,18,'filled');xlabel('随机点像素灰度值');ylabel('与该点相邻水平方向像素灰度值');title('原始缩略图水平相邻元素相关性点图');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
+% figure;scatter(XX_R_SP,YY_R_SP,18,'filled');xlabel('Pixel value on loation(x,y)');ylabel('Pixel value on loation(x+1,y)');title('Horizontal direction');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
 % 
 % %垂直
-figure;scatter(XX_R_CZ,YY_R_CZ,18,'filled');xlabel('通道随机点像素灰度值');ylabel('与该点相邻垂直方向像素灰度值');title('原始缩略图垂直相邻元素相关性点图');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
+% figure;scatter(XX_R_CZ,YY_R_CZ,18,'filled');xlabel('Pixel value on loation(x,y)');ylabel('Pixel value on loation(x,y+1)');title('Vertical direction');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
 % 
 % %对角线
-figure;scatter(XX_R_DJX,YY_R_DJX,18,'filled');xlabel('随机点像素灰度值');ylabel('与该点相邻对角线方向像素灰度值');title('原始缩略图对角线相邻元素相关性点图');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
+% figure;scatter(XX_R_DJX,YY_R_DJX,18,'filled');xlabel('Pixel value on loation(x,y)');ylabel('Pixel value on loation(x+1,y+1)');title('Diagonal direction');axis([0 255,0 255]);set(gca,'XTick',0:15:255);set(gca,'YTick',0:15:255);
 % %R通道
 EX1_R=0;EY1_SP_R=0;DX1_R=0;DY1_SP_R=0;COVXY1_SP_R=0;    %计算水平相关性时需要的变量
 EY1_CZ_R=0;DY1_CZ_R=0;COVXY1_CZ_R=0;                %垂直

@@ -1,31 +1,47 @@
-function [afterTransform] = getFourInv(LT, RT, LB, RB)
-%GETFOURINV 此处显示有关此函数的摘要
-%   此处显示详细说明
+function [suoluetu] = getFourInv(LT, RT, LB, RB)
+    %GETFOURINV 此处显示有关此函数的摘要
+    %   此处显示详细说明
     addpath(genpath('../Transform'));
 
-    [H, W] = size(LT);
-    suoluetu = ones(H * 2, W * 2);
+    [LT_H, LT_W] = size(LT);
+    H = LT_H * 2;
+    W = LT_W * 2;
 
-    suoluetu(1: H, 1: W) = LT;
-    suoluetu(H + 1: H * 2, 1: W) = RT;
-    suoluetu(1: H, H + 1: W * 2) = LB;
-    suoluetu(H + 1: H * 2, W + 1: W * 2) = RB;
+    blockNums = H / 8;
+    LT_Temp = ones(4, 4);
+    RT_Temp = ones(4, 4);
+    LB_Temp = ones(4, 4);
+    RB_Temp = ones(4, 4);
+    temp = ones(8, 8);
 
-    thumbnail_8 = splitImageTo8(suoluetu);
-    blockNums = H * 2 / 8;
+    RB = bitxor(RB, LT);
+    LB = bitxor(LB, LT);
+    RT = bitxor(RT, LT);
+    LT = bitxor(bitxor(bitxor(LT, RB), LB), RT);
 
-    for i = 1: blockNums
-        for j = 1: blockNums
-            [thumbnail_8{i, j}, p] = transform(thumbnail_8{i, j});
-            thumbnail_8{i, j}(1, 1) = p;
-            % 将矩阵位置交换并进行逆变换
-            temp = thumbnail_8{i, j};
-%             temp = positionChange(temp);
-            temp = temp - 255;
-            thumbnail_8{i, j} = transformInv2(temp, temp(1, 1));
+    suoluetu = ones(H, W);
+    suoluetu_8 = splitImageTo8(suoluetu);
+
+    for i = 1:blockNums
+
+        for j = 1:blockNums
+
+            LT_Temp = LT((i - 1) * 4 + 1:i * 4, (j - 1) * 4 + 1:j * 4);
+            RT_Temp = RT((i - 1) * 4 + 1:i * 4, (j - 1) * 4 + 1:j * 4);
+            LB_Temp = LB((i - 1) * 4 + 1:i * 4, (j - 1) * 4 + 1:j * 4);
+            RB_Temp = RB((i - 1) * 4 + 1:i * 4, (j - 1) * 4 + 1:j * 4);
+
+            temp(1:4, 1:4) = LT_Temp;
+            temp(1:4, 5:8) = RT_Temp;
+            temp(5:8, 1:4) = LB_Temp;
+            temp(5:8, 5:8) = RB_Temp;
+
+            suoluetu_8{i, j} = transformInv(temp);
+
         end
+
     end
 
-    afterTransform = cell2mat(thumbnail_8);
+    suoluetu = cell2mat(suoluetu_8);
+    suoluetu = mod(suoluetu, 256);
 end
-

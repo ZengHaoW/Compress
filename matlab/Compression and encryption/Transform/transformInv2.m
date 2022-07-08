@@ -1,7 +1,7 @@
-function [result] = transformInv2(Block, pixelDontChange)
+function [result] = transformInv2(Block)
 %TRANSFORM 对每个8*8的块进行变换
 %   此处显示详细说明
-    Block(1,1) = pixelDontChange;
+%     Block(1,1) = pixelDontChange;
     temp = Block(1:2, 1: 2);
     for i = 1: 8
         for j = 1: 8

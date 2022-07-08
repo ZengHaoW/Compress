@@ -21,7 +21,17 @@ testMatrix = [137 135 140 140 138 140 140 140;
 % c{1, 1}
 % imwrite(uint8(img), './a.jpg')
 
-[a, b] = transform(testMatrix)
-c = transformInv(a, b)
+[a, ~] = transform(testMatrix)
+c = transformInv(a)
 
 isequal(c, testMatrix)
+
+imagePath = './testImage/lena.tiff';
+I = readImage(imagePath);
+[vdt_image, suoluetu] = transformTotalImage(I);
+
+[LT, RT, LB, RB] = getFour(suoluetu);
+
+aaa = getFourInv(LT,RT,LB,RB);
+
+isequal(aaa, suoluetu)

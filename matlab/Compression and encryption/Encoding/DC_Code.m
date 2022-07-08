@@ -72,6 +72,7 @@ function [result] = DC_Code(oneDimensionData)
 %             total_length = total_length + temp_length;
         end
     end
+    result = cell2mat(result);
 %     afterCode = afterCode(1: total_length - 1);
 %     afterCode = cell2mat(result);
 end

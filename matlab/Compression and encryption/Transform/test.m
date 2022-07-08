@@ -9,8 +9,8 @@ t = [137 135 140 140 138 140 140 140;
 137	139	139	136	131	129	139	138;
 138	135	137	134	138	136	139	137]
 
-[a ,b] = transform(t);
-a(1,1) = b;
+[a ,~] = transform(t);
+a = mod(a,256);
 % transformInv(a, b);
 
 % temp = ones(2, 2);
@@ -21,17 +21,17 @@ a(1,1) = b;
 % a(3:4, 1:2) = a(3:4, 3:4);
 % a(3:4, 3:4) = temp;
 
-% a = positionChange(a)
-a = a + 255;
+% a = positionChange(a);
+% a = a + 255;
 
-x = transformInv2(a, b);
-x == t
+% x = transformInv2(a, b);
+% x == t
+% 
+% [a ,b] = transform(x);
+% a(1,1) = b;
+% a = a + 255;
 
-[a ,b] = transform(x);
-a(1,1) = b;
-a = a + 255;
-
-x = transformInv2(a, b);
-
+x = transformInv(a);
+x = mod(x,256);
 x == t
 

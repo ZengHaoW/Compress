@@ -1,6 +1,6 @@
 function [pixel] = DNADecoding(DNA_Code, nums)
 %DNADECODING 根据nums将DNA_Code解码
-%   DNA_Code(1, 5)   pixel(1, 1)
+%   DNA_Code(1, 4)   pixel(1, 1)
     r = ['A' 'T' 'C' 'G'];
     temp = ones(1, 4);  %存放解码后的位数，从高到底 
     for i = 1: 4

@@ -1,0 +1,23 @@
+function [encryptedImage] = DNA_Encoding(image,x, y, z, h)
+%DNA_ENCODING 利用混沌序列对图像进行DNA加密
+%   此处显示详细说明
+    [~, image] = transformTotalImage(image);
+    [H, W] = size(image);
+    nums = H * W;
+    R = x(1:H)' * y(1:W);%随机矩阵
+    R=mod(round(R*10^4),256);%化为0-255的整数
+
+    x=mod(round(x*10^4),8)+1;%使混沌序列X变成范围为1~8的整数
+    y=mod(round(y*10^4),8)+1;%使混沌序列Y变成范围为1~8的整数
+    z=mod(round(z*10^4),4);  %使混沌序列Z变成范围为1~4的整数
+    h=mod(round(h*10^4),8)+1;%使混沌序列H变成范围为1~8的整数
+
+    t = 2;
+    R_1 = R(1:t, 1:t);
+    
+    
+    encryptedImage = image;
+   
+end
+
+function [result] = fenkuai(matrix, dnavalue)

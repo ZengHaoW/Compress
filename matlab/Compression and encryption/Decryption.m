@@ -282,7 +282,6 @@ d = reshape(d, image_H, image_W);
 
 % imshow(d, [])
 b = invTransformTotalImage(d,suoluetu_R);
-
 figure, imshow(b, [])
 
 bb = readImage(imagePath);

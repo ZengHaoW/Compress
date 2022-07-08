@@ -22,6 +22,10 @@ function [result] = positionChange(matrix8)
         end
     end
     result = cell2mat(q);
+    
+    
+    
+    
 end
 
 function [matrix4] = positionChange2(matrix4)
