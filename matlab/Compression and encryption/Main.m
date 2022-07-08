@@ -32,14 +32,14 @@ I1 = imread('./suoluetu_E_1P.tiff');
 I2 = imread('./suoluetu_E.tiff');
 load('image_DNA_1.mat');
 load('image_DNA_2.mat');
-[npcr, uaci] = NPCR_UACI(image_DNA,image_DNA_1)
+[npcr, uaci] = NPCR_UACI(image_DNA, image_DNA_1)
 
 % I1 = imread('./testImage/peppers.tiff');
 % I2 = I1;
 % I2(1,1) = I2(1,1) - 1;
 % sha1 = sha256(I1);
 % sha1 = sha256(I2);
-% 
+%
 % imagePath = './testImage/lena.tiff';
 % I = readImage(imagePath);
 % t_key = [2, 5, 7, 2];

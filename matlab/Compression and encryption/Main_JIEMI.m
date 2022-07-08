@@ -24,13 +24,13 @@ SUM = H * W;
 
 %% 缩略图解密
 % suoluetu_E = double(imnoise(uint8(suoluetu_E),'salt & pepper',0.1));
-suoluetu_E(1: 16, 1: 16) = 0;
-suoluetu = Suoluetu_JIEMI(suoluetu_E,x,y,z,h);
+suoluetu_E(1:16, 1:16) = 0;
+suoluetu = Suoluetu_JIEMI(suoluetu_E, x, y, z, h);
 % suoluetu = Suoluetu_JIEMI(suoluetu,x,y,z,h);
-imshow(suoluetu,[])
+imshow(suoluetu, [])
 %% 解密DC_Code
 DC_Code = Diffusion(DC_Encrytion, x);
-d = DC_DeCode(DC_Code);                    
+d = DC_DeCode(DC_Code);
 d = reshape(d, H, W);
 original_image = invTransformTotalImage(d);
 figure, imshow(original_image, [])

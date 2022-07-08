@@ -7,12 +7,11 @@ function [suoluetu] = Suoluetu_JIEMI(suoluetu_E, x, y, z, h)
 
     DNA_Image_E = [RT_E, LB_E, RB_E];
     DNA_Image = DNA_JIEMI(DNA_Image_E, x, y, z, h);
-    RT = DNA_Image(1:end, 1: LT_H);
-    LB = DNA_Image(1:end, LT_H + 1: LT_H * 2);
-    RB = DNA_Image(1:end, LT_H * 2 + 1: end);
+    RT = DNA_Image(1:end, 1:LT_H);
+    LB = DNA_Image(1:end, LT_H + 1:LT_H * 2);
+    RB = DNA_Image(1:end, LT_H * 2 + 1:end);
 
     LT = HL_JIEMI(LT_E, x, y, z, h);
-
 
     suoluetu = getFourInv(LT, RT, LB, RB);
 end
